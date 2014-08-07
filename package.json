@@ -1,14 +1,19 @@
 {
   "name": "todoist-habitrpg",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "One way sync from Todoist -> HabitRPG.",
   "main": "index.js",
+  "homepage": "https://github.com/Kusold/todoist-habitrpg",
   "scripts": {
     "test": "foo"
   },
+  "bugs": {
+    "url": "https://github.com/Kusold/todoist-habitrpg/issues",
+    "email": "hello@mikekusold.com"
+  },
   "repository": {
     "type": "git",
-    "url": "somewhereongithub"
+    "url": "https://github.com/Kusold/todoist-habitrpg.git"
   },
   "keywords": [
     "todoist",
@@ -17,12 +22,19 @@
     "habit",
     "sync"
   ],
-  "author": "Mike Kusold",
+  "author": {
+    "name": "Mike Kusold",
+    "email": "hello@mikekusold.com",
+    "url": "http://mikekusold.com"
+  },
+  "bin" : { "todoist-habitrpg" : "./index.js" },
+  "os" : [ "darwin", "linux" ],
   "license": "GPL v3",
   "dependencies": {
     "habitrpg-api": "0.0.1",
     "commander": "~2.2.0",
     "superagent": "~0.18.0",
-    "async": "~0.9.0"
+    "async": "~0.9.0",
+    "lodash": "~2.4.1"
   }
 }
