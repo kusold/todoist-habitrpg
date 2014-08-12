@@ -32,7 +32,8 @@
   },
   "os": [
     "darwin",
-    "linux"
+    "linux",
+    "win32"
   ],
   "license": "GPL v3",
   "dependencies": {

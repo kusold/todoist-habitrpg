@@ -33,7 +33,11 @@ function main() {
   }
   // implement custom file storage location later
   if (true) {
-    program.historyPath = process.env.HOME + '/.todoist-habitrpg.json'
+    if(process.platform == "win32") {
+      program.historyPath = process.env.HOMEPATH + '/.todoist-habitrpg.json'
+    } else {
+      program.historyPath = process.env.HOME + '/.todoist-habitrpg.json'
+    }
   }
   
   history = readHistoryFromFile(program.historyPath);
