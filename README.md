@@ -53,7 +53,7 @@ I would recommend setting this up as a cron job for automatic syncing.
 ## Current Limitations
 * Only supports syncing from Todoist -> HabitRPG.
 * Only supports basic task syncing. Subtasks get synced as a toplevel task in HabitRPG
--* Sync History file is hardcoded to be at `$HOME/.todoist-habitrpg.json`-
+~~* Sync History file is hardcoded to be at `$HOME/.todoist-habitrpg.json`~~
 
 ## Roadmap
 * ~~Support Windows~~
