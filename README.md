@@ -28,6 +28,12 @@ Your API Token (todoistApiToken) can be located by following these steps:
 4. Click the "Account" header inside the modal.
 5. Your API Token is located on this page.
 
+## Choosing the directory where the sync history is stored
+Pass a -f flag followed by the directory where you want your file to be stored, relative to your home directory. For example, if you want the json file stored in ~/foo/bar/.todoist-habitrpg.json, you'd write the following at the end of your terminal command
+```
+-f foo/bar
+```
+
 ## Updating to new versions
 Periodically new versions will be published. You can install these updates with the command below.
 
@@ -47,7 +53,7 @@ I would recommend setting this up as a cron job for automatic syncing.
 ## Current Limitations
 * Only supports syncing from Todoist -> HabitRPG.
 * Only supports basic task syncing. Subtasks get synced as a toplevel task in HabitRPG
-* Sync History file is hardcoded to be at `$HOME/.todoist-habitrpg.json`
+-* Sync History file is hardcoded to be at `$HOME/.todoist-habitrpg.json`-
 
 ## Roadmap
 * ~~Support Windows~~
