@@ -32,14 +32,14 @@ function main() {
     console.error("No Todoist API Token found");
     return;
   }
-  if (!program.file) {
-    if(process.platform == "win32") {
-      program.historyPath = process.env.HOMEPATH + '/.todoist-habitrpg.json'
-    } else {
-      program.historyPath = process.env.HOME + '/.todoist-habitrpg.json'
-    }
+  var pathToSyncHistory = '';
+  if (program.file) {
+    pathToSyncHistory = '/' + program.file;
+  }
+  if(process.platform == "win32") {
+    program.historyPath = process.env.HOMEPATH + pathToSyncHistory + '/.todoist-habitrpg.json'
   } else {
-      program.historyPath = process.env + program.file + '/.todoist-habitrpg.json'
+    program.historyPath = process.env.HOME + pathToSyncHistory + '/.todoist-habitrpg.json'
   }
   
   history = readHistoryFromFile(program.historyPath);
