@@ -13,6 +13,7 @@ program
   .option('-u, --uid <s>', 'Your HabitRPG User Id')
   .option('-t, --token <s>', 'Your HabitRPG API Token')
   .option('-a, --todoist <s>', 'Your Todoist API Token')
+  .option('-f, --file <s>', 'Location of your sync history')
   .parse(process.argv);
 
 var history = {};
@@ -31,13 +32,14 @@ function main() {
     console.error("No Todoist API Token found");
     return;
   }
-  // implement custom file storage location later
-  if (true) {
+  if (!program.file) {
     if(process.platform == "win32") {
       program.historyPath = process.env.HOMEPATH + '/.todoist-habitrpg.json'
     } else {
       program.historyPath = process.env.HOME + '/.todoist-habitrpg.json'
     }
+  } else {
+      program.historyPath = process.env + program.file + '/.todoist-habitrpg.json'
   }
   
   history = readHistoryFromFile(program.historyPath);
