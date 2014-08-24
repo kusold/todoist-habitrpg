@@ -57,7 +57,7 @@ I would recommend setting this up as a cron job for automatic syncing.
 
 ## Roadmap
 * ~~Support Windows~~
-* Support specifying where the sync history file is.
+* ~~Support specifying where the sync history file is.~~
 * If a task has a subtask, then create the item on HabitRPG as a checklist
 * If a task belongs to a project, on HabitRPG create a tag with that project name
 * If a task is a daily task then create it as a daily on HabitRPG
