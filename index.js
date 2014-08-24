@@ -111,9 +111,7 @@ function syncItemsToHabitRpg(items, cb) {
     async.waterfall([
       function(cb) {
         var dueDate;
-        if(!item.todoist.due_date_utc) {
-          dueDate = 0;
-        } else {
+        if(item.todoist.due_date_utc) {
           dueDate = new Date(item.todoist.due_date_utc);
         }
 
