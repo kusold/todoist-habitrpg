@@ -112,9 +112,15 @@ function syncItemsToHabitRpg(items, cb) {
   async.eachSeries(items, function(item, next) {
     async.waterfall([
       function(cb) {
+        var dueDate;
+        if(item.todoist.due_date_utc) {
+          dueDate = new Date(item.todoist.due_date_utc);
+        }
+
         var task = {
           text: item.todoist.content,
           dateCreated: new Date(item.todoist.date_added),
+          date: dueDate,
           type: 'todo',
           completed: item.todoist.checked == true
         };
