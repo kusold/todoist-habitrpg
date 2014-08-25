@@ -118,6 +118,9 @@ function syncItemsToHabitRpg(items, cb) {
         };
 
         if(item.habitrpg) {
+          if(task.completed == true && item.habitrpg.completed == false) {
+            habit.user.updateTaskScore(item.habitrpg.id, true, function(response, error){ });
+          }
           habit.user.updateTask(item.habitrpg.id, task, function(err, res) {
             cb(err, res)
           });
