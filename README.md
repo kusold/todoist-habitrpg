@@ -31,7 +31,7 @@ Your API Token (todoistApiToken) can be located by following these steps:
 ## Choosing the directory where the sync history is stored
 Pass a -f flag followed by the directory where you want your file to be stored, relative to your home directory. For example, if you want the json file stored in ~/foo/bar/.todoist-habitrpg.json, you'd write the following at the end of your terminal command
 ```
--f foo/bar
+-f ~/foo/bar
 ```
 
 ## Updating to new versions
