@@ -27,6 +27,12 @@
     "email": "hello@mikekusold.com",
     "url": "http://mikekusold.com"
   },
+  "contributors": [
+    {
+      "name": "Blade Barringer",
+      "url": "https://github.com/crookedneighbor"
+    }
+  ],
   "bin": {
     "todoist-habitrpg": "./index.js"
   },
