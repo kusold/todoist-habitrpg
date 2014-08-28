@@ -153,3 +153,7 @@ function syncItemsToHabitRpg(items, cb) {
     cb(err, history);
   });
 }
+
+module.exports = {
+  findTasksThatNeedUpdating: findTasksThatNeedUpdating
+};
