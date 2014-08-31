@@ -69,9 +69,11 @@ function findTasksThatNeedUpdating(newHistory, oldHistory) {
   var needToUpdate = []
   _.forEach(newHistory.tasks, function(item) {
     var old = oldHistory.tasks[item.todoist.id];
+    var updateLabels = checkTodoistLabels(old.todoist.labels, item.todoist.labels);
     if(!old || !old.todoist || old.todoist.content != item.todoist.content ||
        old.todoist.checked != item.todoist.checked ||
-       old.todoist.due_date_utc != item.todoist.due_date_utc) {
+       old.todoist.due_date_utc != item.todoist.due_date_utc ||
+       updateLabels) {
       needToUpdate.push(item);
     }
   });
