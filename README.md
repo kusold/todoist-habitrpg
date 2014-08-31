@@ -44,6 +44,8 @@ Once you've reached level 10 in HabitRPG, you start gaining skill points and can
 | Constitution   | con, constitution, social, soc |
 | Perception     | per, perception, other, oth    |
 
+If more than one valid label is assigned to a task in todoist, the first valid label will be assigned to the task in HabitRPG.
+
 ## Updating to new versions
 Periodically new versions will be published. You can install these updates with the command below.
 
