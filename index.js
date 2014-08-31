@@ -43,6 +43,8 @@ function main() {
     }
   }
   
+  getHabitAttributeIds()
+  
   history = readHistoryFromFile(program.historyPath);
   if(!history.tasks) {
     history.tasks = {};
@@ -116,11 +118,10 @@ function syncItemsToHabitRpg(items, cb) {
   async.eachSeries(items, function(item, next) {
     async.waterfall([
       function(cb) {
-        var dueDate;
+        var dueDate, attribute;
         if(item.todoist.due_date_utc) {
           dueDate = new Date(item.todoist.due_date_utc);
         }
-
         var task = {
           text: item.todoist.content,
           dateCreated: new Date(item.todoist.date_added),
@@ -128,7 +129,13 @@ function syncItemsToHabitRpg(items, cb) {
           type: 'todo',
           completed: item.todoist.checked == true
         };
-
+        if (item.todoist.labels.length > 0) {
+          attribute = checkForAttributes(item.todoist.labels);
+        } 
+        if(attribute) {
+          task.attribute = attribute;
+        }
+        
         if(item.habitrpg) {
           // Checks if the complete status has changed
           if(task.completed != item.habitrpg.completed && item.habitrpg.completed != undefined) {
