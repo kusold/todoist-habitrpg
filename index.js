@@ -16,7 +16,8 @@ program
   .option('-f, --file <s>', 'Location of your sync history')
   .parse(process.argv);
 
-var history = {};
+var history = {},
+    habitAttributes;
 main();
 
 function main() {
@@ -152,4 +153,74 @@ function syncItemsToHabitRpg(items, cb) {
   }, function(err) {
     cb(err, history);
   });
+}
+
+function getHabitAttributeIds() {
+  // Gets a list of label ids and puts
+  // them in an object if they correspond
+  // to HabitRPG attributes (str, int, etc)
+  
+  var labels = {};
+
+  request.post('https://api.todoist.com/API/getLabels')
+	 .send('token=' + program.todoist)
+   .end(function(err, res) {
+     labelObject = res.body;
+     for(var l in labelObject) {
+      labels[l] = labelObject[l].id;
+     }
+
+    var attributes = {str: [], int: [], con: [], per: []}
+
+    for(var l in labels) {
+      if (l == 'str' || l == 'strength' 
+            || l == 'physical' || l == 'phy') {
+        attributes.str.push(labels[l]);
+      } else if (l == 'int' || l == 'intelligence' 
+            || l == 'mental' || l == 'men') {
+        attributes.int.push(labels[l]);
+      } else if (l == 'con' || l == 'constitution' 
+            || l == 'social' || l == 'soc') {
+        attributes.con.push(labels[l]);
+      } else if (l == 'per' || l == 'perception' 
+            || l == 'other' || l == 'oth') {
+        attributes.per.push(labels[l]);
+      }
+    }
+
+    habitAttributes = attributes;
+  });
+}
+
+function checkForAttributes(labels) {
+  // Cycle through todoist labels
+  // For each label id, check it against the ids stored in habitAttributes
+  // If a match is found, return it
+
+  for(var label in labels) { 
+    for(var att in habitAttributes) {
+      for(var num in habitAttributes[att]) {
+        if(habitAttributes[att][num] == labels[label]) {
+          return att;
+        }
+      }
+    }
+  }
+}
+
+function checkTodoistLabels(oldLabel, newLabel) {
+  // Compares ids of todoist labels to determine
+  // if the item needs updating
+  
+  if(oldLabel.length != newLabel.length) {
+    return true;
+  }
+
+  for(var i in oldLabel) {
+    if(oldLabel[i] != newLabel[i]) {
+      return true;
+    }
+  }
+
+  return false;
 }
