@@ -81,7 +81,15 @@ function findTasksThatNeedUpdating(newHistory, oldHistory) {
 function updateHistoryForTodoistItems(items) {
   _.forEach(items, function(item) {
     if(history.tasks[item.id]) {
-      history.tasks[item.id].todoist = item;
+      if(item.is_deleted) {
+        var habit = new habitapi(program.uid, program.token);
+        var habitId = history.tasks[item.id].habitrpg.id;
+        habit.user.deleteTask(habitId, function(response, error){})
+        // Deletes record from sync history
+        delete history.tasks[item.id];
+      } else {
+        history.tasks[item.id].todoist = item;
+      }
     } else {
       history.tasks[item.id] = {todoist: item}
     }
