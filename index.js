@@ -70,7 +70,8 @@ function findTasksThatNeedUpdating(newHistory, oldHistory) {
     var old = oldHistory.tasks[item.todoist.id];
     if(!old || !old.todoist || old.todoist.content != item.todoist.content ||
        old.todoist.checked != item.todoist.checked ||
-       old.todoist.due_date_utc != item.todoist.due_date_utc) {
+       old.todoist.due_date_utc != item.todoist.due_date_utc ||
+       old.todoist.is_deleted != item.todoist.is_deleted) {
       needToUpdate.push(item);
     }
   });
