@@ -85,12 +85,14 @@ function updateHistoryForTodoistItems(items) {
         var habit = new habitapi(program.uid, program.token);
         var habitId = history.tasks[item.id].habitrpg.id;
         habit.user.deleteTask(habitId, function(response, error){})
+
         // Deletes record from sync history
         delete history.tasks[item.id];
       } else {
         history.tasks[item.id].todoist = item;
       }
-    } else {
+    } else if(!item.is_deleted) {
+      // Only adds item to history if it was not deleted before syncing to habitrpg
       history.tasks[item.id] = {todoist: item}
     }
   });
