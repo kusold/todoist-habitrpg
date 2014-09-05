@@ -1,48 +1,50 @@
-#!/usr/bin/env node
-
-var program = require('commander');
 var habitapi = require('habitrpg-api');
 var request = require('superagent');
 var async = require('async');
 var fs = require('fs');
 var _ = require('lodash');
 
-program
-  .version('0.0.1')
-  .usage('-u habitRpgUserId -t habitRpgApiToken -a todoistApiToken')
-  .option('-u, --uid <s>', 'Your HabitRPG User Id')
-  .option('-t, --token <s>', 'Your HabitRPG API Token')
-  .option('-a, --todoist <s>', 'Your Todoist API Token')
-  .option('-f, --file <s>', 'Location of your sync history')
-  .parse(process.argv);
-
 var history = {};
-main();
 
-function main() {
-  if (!program.uid) {
-    console.error("No HabitRPG User Id found");
-    return;
+//
+// options.uid: HabitRPG UserId
+// options.token: HabitRPG API Token
+// options.todoist: Todoist API Token
+// options.historyPath: Directory for history
+//
+function habitSync(options) {
+  if(!options) {
+    throw new Error("Options are required");
   }
-  if (!program.token) {
-    console.error("No HabitRPG API Token found");
-    return;
+  if(!options.uid) {
+    throw new Error("No HabitRPG User Id found");
   }
-  if (!program.todoist) {
-    console.error("No Todoist API Token found");
-    return;
+  if (!options.token) {
+    throw new Error("No HabitRPG API Token found");
   }
-  if (program.file) {
-    program.historyPath = program.file + '/.todoist-habitrpg.json';
+  if (!options.todoist) {
+    throw new Error("No Todoist API Token found");
+  }
+
+  if (options.historyPath) {
+    this.historyPath = options.historyPath + '/.todoist-habitrpg.json';
   } else {
+    // Defaults
     if(process.platform == "win32") {
-      program.historyPath = process.env.HOMEPATH + '/.todoist-habitrpg.json'
+      this.historyPath = process.env.HOMEPATH + '/.todoist-habitrpg.json'
     } else {
-      program.historyPath = process.env.HOME + '/.todoist-habitrpg.json'
+      this.historyPath = process.env.HOME + '/.todoist-habitrpg.json'
     }
   }
-  
-  history = readHistoryFromFile(program.historyPath);
+
+  this.uid = options.uid;
+  this.token = options.token;
+  this.todoist = options.todoist;
+}
+
+habitSync.prototype.run = function(done) {
+  var self = this;
+  history = self.readHistoryFromFile(self.historyPath);
   if(!history.tasks) {
     history.tasks = {};
   }
@@ -51,20 +53,21 @@ function main() {
 
   async.waterfall([
     function(cb) {
-      getTodoistSync(cb);
+      self.getTodoistSync(cb);
     },
     function(res, cb) {
       history.seqNo = res.body.seq_no;
-      updateHistoryForTodoistItems(res.body.Items);
-      var changedTasks = findTasksThatNeedUpdating(history, oldHistory);
-      syncItemsToHabitRpg(changedTasks, cb);
+      self.updateHistoryForTodoistItems(res.body.Items);
+      var changedTasks = self.findTasksThatNeedUpdating(history, oldHistory);
+      self.syncItemsToHabitRpg(changedTasks, cb);
     }
   ], function(err, newHistory) {
-    fs.writeFileSync(program.historyPath, JSON.stringify(newHistory));
+    fs.writeFileSync(self.historyPath, JSON.stringify(newHistory));
+    done();
   });
 }
 
-function findTasksThatNeedUpdating(newHistory, oldHistory) {
+habitSync.prototype.findTasksThatNeedUpdating = function(newHistory, oldHistory) {
   var needToUpdate = []
   _.forEach(newHistory.tasks, function(item) {
     var old = oldHistory.tasks[item.todoist.id];
@@ -77,7 +80,7 @@ function findTasksThatNeedUpdating(newHistory, oldHistory) {
   return needToUpdate;
 }
 
-function updateHistoryForTodoistItems(items) {
+habitSync.prototype.updateHistoryForTodoistItems = function(items) {
   _.forEach(items, function(item) {
     if(history.tasks[item.id]) {
       history.tasks[item.id].todoist = item;
@@ -87,7 +90,7 @@ function updateHistoryForTodoistItems(items) {
   });
 }
 
-function readHistoryFromFile(path) {
+habitSync.prototype.readHistoryFromFile = function(path) {
   var history = {};
   if(fs.existsSync(path)) {
     var data = fs.readFileSync(path, 'utf8');
@@ -96,18 +99,18 @@ function readHistoryFromFile(path) {
   return history;
 }
 
-function getTodoistSync(cb) {
+habitSync.prototype.getTodoistSync = function(cb) {
   var seqNo = history.seqNo || 0;
 
   request.post('https://api.todoist.com/TodoistSync/v5.3/get')
-	 .send('api_token=' + program.todoist)
-	 .send('seq_no='+seqNo)
-	 .end(function(err, res) {
-	   cb(err,res);
-	 });
+   .send('api_token=' + program.todoist)
+   .send('seq_no='+seqNo)
+   .end(function(err, res) {
+     cb(err,res);
+   });
 }
 
-function syncItemsToHabitRpg(items, cb) {
+habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
   var habit = new habitapi(program.uid, program.token);
   // Cannot execute in parallel. See: https://github.com/HabitRPG/habitrpg/issues/2301
   async.eachSeries(items, function(item, next) {
@@ -154,6 +157,4 @@ function syncItemsToHabitRpg(items, cb) {
   });
 }
 
-module.exports = {
-  findTasksThatNeedUpdating: findTasksThatNeedUpdating
-};
+module.exports = habitSync;
