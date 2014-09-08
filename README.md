@@ -34,6 +34,18 @@ Pass a -f flag followed by the directory where you want your file to be stored, 
 -f ~/foo/bar
 ```
 
+## Assigning Attribute Labels
+Once you've reached level 10 in HabitRPG, you start gaining skill points and can choose to allocate those skill points based on the kind of task you do. You can choose what kind of task it is by applying labels in Todoist. Below is a list of valid labels for each attribute.
+
+| Attribute Name | Valid Labels                   |
+| -------------  | ------------------------------ |
+| Strength       | str, strength, physical, phy   |
+| Intelligence   | int, intelligence, mental, men |
+| Constitution   | con, constitution, social, soc |
+| Perception     | per, perception, other, oth    |
+
+If more than one valid label is assigned to a task in todoist, the first valid label will be assigned to the task in HabitRPG.
+
 ## Updating to new versions
 Periodically new versions will be published. You can install these updates with the command below.
 
