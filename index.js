@@ -78,6 +78,7 @@ function findTasksThatNeedUpdating(newHistory, oldHistory) {
     if(!old || !old.todoist || old.todoist.content != item.todoist.content ||
        old.todoist.checked != item.todoist.checked ||
        old.todoist.due_date_utc != item.todoist.due_date_utc ||
+       old.todoist.is_deleted != item.todoist.is_deleted ||
        updateLabels) {
       needToUpdate.push(item);
     }
@@ -88,8 +89,18 @@ function findTasksThatNeedUpdating(newHistory, oldHistory) {
 function updateHistoryForTodoistItems(items) {
   _.forEach(items, function(item) {
     if(history.tasks[item.id]) {
-      history.tasks[item.id].todoist = item;
-    } else {
+      if(item.is_deleted) {
+        var habit = new habitapi(program.uid, program.token);
+        var habitId = history.tasks[item.id].habitrpg.id;
+        habit.user.deleteTask(habitId, function(response, error){})
+
+        // Deletes record from sync history
+        delete history.tasks[item.id];
+      } else {
+        history.tasks[item.id].todoist = item;
+      }
+    } else if(!item.is_deleted) {
+      // Only adds item to history if it was not deleted before syncing to habitrpg
       history.tasks[item.id] = {todoist: item}
     }
   });
