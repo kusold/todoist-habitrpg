@@ -111,7 +111,8 @@ habitSync.prototype.getTodoistSync = function(cb) {
 }
 
 habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
-  var habit = new habitapi(program.uid, program.token);
+  var self = this;
+  var habit = new habitapi(self.uid, self.token);
   // Cannot execute in parallel. See: https://github.com/HabitRPG/habitrpg/issues/2301
   async.eachSeries(items, function(item, next) {
     async.waterfall([
@@ -128,18 +129,18 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
           type: 'todo',
           completed: item.todoist.checked == true
         };
-
         if(item.habitrpg) {
           // Checks if the complete status has changed
-          if(task.completed != item.habitrpg.completed && item.habitrpg.completed != undefined) {
+          if((task.completed != item.habitrpg.completed && item.habitrpg.completed !== undefined) ||
+             (task.completed == true && item.habitrpg.completed === undefined)) {
             var direction = task.completed == true;
-            habit.user.updateTaskScore(item.habitrpg.id, direction, function(response, error){ });
+            habit.updateTaskScore(item.habitrpg.id, direction, function(response, error){ });
           }
-          habit.user.updateTask(item.habitrpg.id, task, function(err, res) {
+          habit.updateTask(item.habitrpg.id, task, function(err, res) {
             cb(err, res)
           });
         } else {
-          habit.user.createTask(task, function(err, res) {
+          habit.createTask(task, function(err, res) {
             cb(err, res)
           });
         }
