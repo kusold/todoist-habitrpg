@@ -89,10 +89,11 @@ habitSync.prototype.findTasksThatNeedUpdating = function(newHistory, oldHistory)
 }
 
 habitSync.prototype.updateHistoryForTodoistItems = function(items) {
+  var self = this;
   _.forEach(items, function(item) {
     if(history.tasks[item.id]) {
       if(item.is_deleted) {
-        var habit = new habitapi(program.uid, program.token);
+        var habit = new habitapi(self.uid, self.token);
         var habitId = history.tasks[item.id].habitrpg.id;
         habit.user.deleteTask(habitId, function(response, error){})
 
@@ -118,10 +119,11 @@ habitSync.prototype.readHistoryFromFile = function(path) {
 }
 
 habitSync.prototype.getTodoistSync = function(cb) {
+  var self = this;
   var seqNo = history.seqNo || 0;
 
   request.post('https://api.todoist.com/TodoistSync/v5.3/get')
-   .send('api_token=' + program.todoist)
+   .send('api_token=' + self.todoist)
    .send('seq_no='+seqNo)
    .end(function(err, res) {
      cb(err,res);
@@ -186,11 +188,11 @@ function getHabitAttributeIds() {
   // Gets a list of label ids and puts
   // them in an object if they correspond
   // to HabitRPG attributes (str, int, etc)
-  
+  var self = this;
   var labels = {};
 
   request.post('https://api.todoist.com/API/getLabels')
-	 .send('token=' + program.todoist)
+	 .send('token=' + self.todoist)
    .end(function(err, res) {
      labelObject = res.body;
      for(var l in labelObject) {
