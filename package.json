@@ -39,6 +39,7 @@
   "bin": {
     "todoist-habitrpg": "./main.js"
   },
+  "engines" : { "node" : ">=0.10" },
   "os": [
     "darwin",
     "linux",
