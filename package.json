@@ -4,8 +4,11 @@
   "description": "One way sync from Todoist -> HabitRPG.",
   "main": "index.js",
   "homepage": "https://github.com/Kusold/todoist-habitrpg",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
-    "test": "foo"
+    "test": "mocha"
   },
   "bugs": {
     "url": "https://github.com/Kusold/todoist-habitrpg/issues",
@@ -34,8 +37,9 @@
     }
   ],
   "bin": {
-    "todoist-habitrpg": "./index.js"
+    "todoist-habitrpg": "./main.js"
   },
+  "engines" : { "node" : ">=0.10" },
   "os": [
     "darwin",
     "linux",
@@ -43,11 +47,17 @@
   ],
   "license": "GPL v3",
   "dependencies": {
-    "habitrpg-api": "0.0.1",
+    "habitrpg-api": "~0.1.0",
     "commander": "~2.2.0",
     "superagent": "~0.18.0",
     "async": "~0.9.0",
     "lodash": "~2.4.1"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "mocha": "^1.21.4",
+    "sinon": "^1.10.3",
+    "sinon-chai": "^2.5.0"
   },
   "preferGlobal": true
 }

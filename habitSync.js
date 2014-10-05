@@ -1,51 +1,51 @@
 #!/usr/bin/env node
-
-var program = require('commander');
 var habitapi = require('habitrpg-api');
 var request = require('superagent');
 var async = require('async');
 var fs = require('fs');
 var _ = require('lodash');
 
-program
-  .version('0.0.1')
-  .usage('-u habitRpgUserId -t habitRpgApiToken -a todoistApiToken')
-  .option('-u, --uid <s>', 'Your HabitRPG User Id')
-  .option('-t, --token <s>', 'Your HabitRPG API Token')
-  .option('-a, --todoist <s>', 'Your Todoist API Token')
-  .option('-f, --file <s>', 'Location of your sync history')
-  .parse(process.argv);
+var history = {};
 
-var history = {},
-    habitAttributes;
-main();
+//
+// options.uid: HabitRPG UserId
+// options.token: HabitRPG API Token
+// options.todoist: Todoist API Token
+// options.historyPath: Directory for history
+//
+function habitSync(options) {
+  if(!options) {
+    throw new Error("Options are required");
+  }
+  if(!options.uid) {
+    throw new Error("No HabitRPG User Id found");
+  }
+  if (!options.token) {
+    throw new Error("No HabitRPG API Token found");
+  }
+  if (!options.todoist) {
+    throw new Error("No Todoist API Token found");
+  }
 
-function main() {
-  if (!program.uid) {
-    console.error("No HabitRPG User Id found");
-    return;
-  }
-  if (!program.token) {
-    console.error("No HabitRPG API Token found");
-    return;
-  }
-  if (!program.todoist) {
-    console.error("No Todoist API Token found");
-    return;
-  }
-  if (program.file) {
-    program.historyPath = program.file + '/.todoist-habitrpg.json';
+  if (options.historyPath) {
+    this.historyPath = options.historyPath + '/.todoist-habitrpg.json';
   } else {
+    // Defaults
     if(process.platform == "win32") {
-      program.historyPath = process.env.HOMEPATH + '/.todoist-habitrpg.json'
+      this.historyPath = process.env.HOMEPATH + '/.todoist-habitrpg.json'
     } else {
-      program.historyPath = process.env.HOME + '/.todoist-habitrpg.json'
+      this.historyPath = process.env.HOME + '/.todoist-habitrpg.json'
     }
   }
-  
-  getHabitAttributeIds()
-  
-  history = readHistoryFromFile(program.historyPath);
+
+  this.uid = options.uid;
+  this.token = options.token;
+  this.todoist = options.todoist;
+}
+
+habitSync.prototype.run = function(done) {
+  var self = this;
+  history = self.readHistoryFromFile(self.historyPath);
   if(!history.tasks) {
     history.tasks = {};
   }
@@ -54,26 +54,35 @@ function main() {
 
   async.waterfall([
     function(cb) {
-      getTodoistSync(cb);
+      self.getHabitAttributeIds(cb)
+    },
+    function(attributes, cb) {
+      habitAttributes = attributes;
+      self.getTodoistSync(cb);
     },
     function(res, cb) {
       history.seqNo = res.body.seq_no;
-      updateHistoryForTodoistItems(res.body.Items);
-      var changedTasks = findTasksThatNeedUpdating(history, oldHistory);
-      syncItemsToHabitRpg(changedTasks, cb);
+      self.updateHistoryForTodoistItems(res.body.Items);
+      var changedTasks = self.findTasksThatNeedUpdating(history, oldHistory);
+      self.syncItemsToHabitRpg(changedTasks, cb);
     }
   ], function(err, newHistory) {
-    fs.writeFileSync(program.historyPath, JSON.stringify(newHistory));
+    if(err) {
+      return done(err);
+    }
+    fs.writeFileSync(self.historyPath, JSON.stringify(newHistory));
+    done();
   });
 }
 
-function findTasksThatNeedUpdating(newHistory, oldHistory) {
+habitSync.prototype.findTasksThatNeedUpdating = function(newHistory, oldHistory) {
+  var self = this;
   var needToUpdate = []
   _.forEach(newHistory.tasks, function(item) {
     var old = oldHistory.tasks[item.todoist.id];
     var updateLabels = false;
     if(old) {
-      updateLabels = checkTodoistLabels(old.todoist.labels, item.todoist.labels);
+      updateLabels = self.checkTodoistLabels(old.todoist.labels, item.todoist.labels);
     }
     if(!old || !old.todoist || old.todoist.content != item.todoist.content ||
        old.todoist.checked != item.todoist.checked ||
@@ -86,13 +95,15 @@ function findTasksThatNeedUpdating(newHistory, oldHistory) {
   return needToUpdate;
 }
 
-function updateHistoryForTodoistItems(items) {
+habitSync.prototype.updateHistoryForTodoistItems = function(items) {
+  var self = this;
+  var habit = new habitapi(self.uid, self.token);
   _.forEach(items, function(item) {
     if(history.tasks[item.id]) {
       if(item.is_deleted) {
-        var habit = new habitapi(program.uid, program.token);
+        // TODO: Determine if you want to delete the task in the habit sync function
         var habitId = history.tasks[item.id].habitrpg.id;
-        habit.user.deleteTask(habitId, function(response, error){})
+        habit.deleteTask(habitId, function(response, error){})
 
         // Deletes record from sync history
         delete history.tasks[item.id];
@@ -106,7 +117,7 @@ function updateHistoryForTodoistItems(items) {
   });
 }
 
-function readHistoryFromFile(path) {
+habitSync.prototype.readHistoryFromFile = function(path) {
   var history = {};
   if(fs.existsSync(path)) {
     var data = fs.readFileSync(path, 'utf8');
@@ -115,19 +126,21 @@ function readHistoryFromFile(path) {
   return history;
 }
 
-function getTodoistSync(cb) {
+habitSync.prototype.getTodoistSync = function(cb) {
+  var self = this;
   var seqNo = history.seqNo || 0;
 
   request.post('https://api.todoist.com/TodoistSync/v5.3/get')
-	 .send('api_token=' + program.todoist)
-	 .send('seq_no='+seqNo)
-	 .end(function(err, res) {
-	   cb(err,res);
-	 });
+   .send('api_token=' + self.todoist)
+   .send('seq_no='+seqNo)
+   .end(function(err, res) {
+     cb(err,res);
+   });
 }
 
-function syncItemsToHabitRpg(items, cb) {
-  var habit = new habitapi(program.uid, program.token);
+habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
+  var self = this;
+  var habit = new habitapi(self.uid, self.token);
   // Cannot execute in parallel. See: https://github.com/HabitRPG/habitrpg/issues/2301
   async.eachSeries(items, function(item, next) {
     async.waterfall([
@@ -144,7 +157,7 @@ function syncItemsToHabitRpg(items, cb) {
           completed: item.todoist.checked == true
         };
         if (item.todoist.labels.length > 0) {
-          attribute = checkForAttributes(item.todoist.labels);
+          attribute = self.checkForAttributes(item.todoist.labels);
         } 
         if(attribute) {
           task.attribute = attribute;
@@ -152,15 +165,16 @@ function syncItemsToHabitRpg(items, cb) {
         
         if(item.habitrpg) {
           // Checks if the complete status has changed
-          if(task.completed != item.habitrpg.completed && item.habitrpg.completed != undefined) {
+          if((task.completed != item.habitrpg.completed && item.habitrpg.completed !== undefined) ||
+             (task.completed == true && item.habitrpg.completed === undefined)) {
             var direction = task.completed == true;
-            habit.user.updateTaskScore(item.habitrpg.id, direction, function(response, error){ });
+            habit.updateTaskScore(item.habitrpg.id, direction, function(response, error){ });
           }
-          habit.user.updateTask(item.habitrpg.id, task, function(err, res) {
+          habit.updateTask(item.habitrpg.id, task, function(err, res) {
             cb(err, res)
           });
         } else {
-          habit.user.createTask(task, function(err, res) {
+          habit.createTask(task, function(err, res) {
             cb(err, res)
           });
         }
@@ -178,17 +192,17 @@ function syncItemsToHabitRpg(items, cb) {
   });
 }
 
-function getHabitAttributeIds() {
+habitSync.prototype.getHabitAttributeIds = function(callback) {
   // Gets a list of label ids and puts
   // them in an object if they correspond
   // to HabitRPG attributes (str, int, etc)
-  
+  var self = this;
   var labels = {};
 
   request.post('https://api.todoist.com/API/getLabels')
-	 .send('token=' + program.todoist)
+	 .send('token=' + self.todoist)
    .end(function(err, res) {
-     labelObject = res.body;
+     var labelObject = res.body;
      for(var l in labelObject) {
       labels[l] = labelObject[l].id;
      }
@@ -211,11 +225,11 @@ function getHabitAttributeIds() {
       }
     }
 
-    habitAttributes = attributes;
+    callback(null, attributes)
   });
 }
 
-function checkForAttributes(labels) {
+habitSync.prototype.checkForAttributes = function(labels) {
   // Cycle through todoist labels
   // For each label id, check it against the ids stored in habitAttributes
   // If a match is found, return it
@@ -231,7 +245,7 @@ function checkForAttributes(labels) {
   }
 }
 
-function checkTodoistLabels(oldLabel, newLabel) {
+habitSync.prototype.checkTodoistLabels = function(oldLabel, newLabel) {
   // Compares ids of todoist labels to determine
   // if the item needs updating
   
@@ -247,3 +261,5 @@ function checkTodoistLabels(oldLabel, newLabel) {
 
   return false;
 }
+
+module.exports = habitSync;
