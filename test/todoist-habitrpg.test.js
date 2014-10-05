@@ -201,6 +201,8 @@ describe('todoist-habitrpg', function (done) {
     getTodoistSyncStub.reset();
     syncItemsToHabitRpgSpy.reset();
     habitapiStub.updateTask.reset();
+    habitapiStub.createTask.reset();
+    habitapiStub.deleteTask.reset();
     requestStub.reset();
   });
 
@@ -410,7 +412,28 @@ describe('todoist-habitrpg', function (done) {
 
     sync.run(function() {
       expect(habitapiStub.deleteTask).to.have.been.called
+      expect(habitapiStub.updateTask).to.have.not.been.called
+      expect(habitapiStub.createTask).to.have.not.been.called
       expect(habitapiStub.deleteTask).to.have.been.calledWithMatch(44444445)
+      expect(writeFileSyncStub).to.have.been.called;
+      done();
+    });
+  });
+
+  it('should not try to delete a task on habitrpg that wasn\'t synced yet', function(done) {
+    var modifiedTodoistResp = _.cloneDeep(todoistResponse)
+    modifiedTodoistResp.Items[0].is_deleted = true
+    readHistoryFromFileStub.returns({
+      seqNo: todoistResponse.seq_no,
+      tasks: {
+        }
+    });
+    getTodoistSyncStub.callsArgWith(0, null, {body: modifiedTodoistResp});
+
+    sync.run(function() {
+      expect(habitapiStub.deleteTask).to.have.not.been.called
+      expect(habitapiStub.updateTask).to.have.not.been.called
+      expect(habitapiStub.createTask).to.have.not.been.called
       expect(writeFileSyncStub).to.have.been.called;
       done();
     });

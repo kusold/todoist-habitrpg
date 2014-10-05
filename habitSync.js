@@ -94,14 +94,13 @@ habitSync.prototype.findTasksThatNeedUpdating = function(newHistory, oldHistory)
 
 habitSync.prototype.updateHistoryForTodoistItems = function(items) {
   var self = this;
+  var habit = new habitapi(self.uid, self.token);
   _.forEach(items, function(item) {
     if(history.tasks[item.id]) {
       if(item.is_deleted) {
-        // TODO: Bring habit out above the forEach
         // TODO: Determine if you want to delete the task in the habit sync function
-        var habit = new habitapi(self.uid, self.token);
         var habitId = history.tasks[item.id].habitrpg.id;
-        habit.user.deleteTask(habitId, function(response, error){})
+        habit.deleteTask(habitId, function(response, error){})
 
         // Deletes record from sync history
         delete history.tasks[item.id];
