@@ -7,6 +7,7 @@ var fs = require('fs');
 var _ = require('lodash');
 var habitapi = require('habitrpg-api');
 var thrpg = require('../habitSync.js');
+var request = require('superagent');
 
 chai.use(expect);
 chai.use(sinonChai);
@@ -41,12 +42,134 @@ describe('todoist-habitrpg', function (done) {
       "id": 44444444
     }]
   };
+  var todoistLabelResponse = {
+    "oth": {
+      "is_deleted": 0,
+      "name": "oth",
+      "color": 7,
+      "id": 414269,
+      "uid": 1539048
+    },
+    "soc": {
+      "is_deleted": 0,
+      "name": "soc",
+      "color": 7,
+      "id": 414265,
+      "uid": 1539048
+    },
+    "perception": {
+      "is_deleted": 0,
+      "name": "perception",
+      "color": 7,
+      "id": 414267,
+      "uid": 1539048
+    },
+    "physical": {
+      "is_deleted": 0,
+      "name": "physical",
+      "color": 7,
+      "id": 414256,
+      "uid": 1539048
+    },
+    "mental": {
+      "is_deleted": 0,
+      "name": "mental",
+      "color": 7,
+      "id": 414260,
+      "uid": 1539048
+    },
+    "int": {
+      "is_deleted": 0,
+      "name": "int",
+      "color": 7,
+      "id": 414258,
+      "uid": 1539048
+    },
+    "intelligence": {
+      "is_deleted": 0,
+      "name": "intelligence",
+      "color": 7,
+      "id": 414259,
+      "uid": 1539048
+    },
+    "men": {
+      "is_deleted": 0,
+      "name": "men",
+      "color": 7,
+      "id": 414261,
+      "uid": 1539048
+    },
+    "per": {
+      "is_deleted": 0,
+      "name": "per",
+      "color": 7,
+      "id": 414266,
+      "uid": 1539048
+    },
+    "testlabel": {
+      "is_deleted": 0,
+      "name": "testLabel",
+      "color": 7,
+      "id": 414247,
+      "uid": 1539048
+    },
+    "phy": {
+      "is_deleted": 0,
+      "name": "phy",
+      "color": 7,
+      "id": 414257,
+      "uid": 1539048
+    },
+    "other": {
+      "is_deleted": 0,
+      "name": "other",
+      "color": 7,
+      "id": 414268,
+      "uid": 1539048
+    },
+    "str": {
+      "is_deleted": 0,
+      "name": "str",
+      "color": 7,
+      "id": 414253,
+      "uid": 1539048
+    },
+    "social": {
+      "is_deleted": 0,
+      "name": "social",
+      "color": 7,
+      "id": 414264,
+      "uid": 1539048
+    },
+    "con": {
+      "is_deleted": 0,
+      "name": "con",
+      "color": 7,
+      "id": 414262,
+      "uid": 1539048
+    },
+    "strength": {
+      "is_deleted": 0,
+      "name": "strength",
+      "color": 7,
+      "id": 414254,
+      "uid": 1539048
+    },
+    "constitution": {
+      "is_deleted": 0,
+      "name": "constitution",
+      "color": 7,
+      "id": 414263,
+      "uid": 1539048
+    }};
+
   var sync = undefined;
   var readHistoryFromFileStub = undefined;
   var writeFileSyncStub = undefined;
   var getTodoistSyncStub = undefined;
   var syncItemsToHabitRpgSpy = undefined;
   var habitapiStub = undefined;
+  var requestStub = undefined
   var taskGenerator = function(todoistItem) {
     return {
       text: todoistItem.content,
@@ -64,8 +187,12 @@ describe('todoist-habitrpg', function (done) {
     getTodoistSyncStub = sinon.stub(sync, 'getTodoistSync');
     syncItemsToHabitRpgSpy = sinon.spy(sync, 'syncItemsToHabitRpg');
     habitapiStub = sinon.stub(habitapi.prototype);
-    habitapiStub.createTask.yields(null, {})
-    habitapiStub.updateTask.yields(null, {})
+    habitapiStub.createTask.yields(null, {});
+    habitapiStub.updateTask.yields(null, {});
+    requestStub = sinon.stub(request.Request.prototype, 'end');
+    // TODO: If we add another superagent call, this will need
+    // to be improved to look at the URL.
+    requestStub.yields(null, {body: todoistLabelResponse});
   });
 
   afterEach(function() {
@@ -74,6 +201,7 @@ describe('todoist-habitrpg', function (done) {
     getTodoistSyncStub.reset();
     syncItemsToHabitRpgSpy.reset();
     habitapiStub.updateTask.reset();
+    requestStub.reset();
   });
 
   after(function() {
@@ -216,7 +344,98 @@ describe('todoist-habitrpg', function (done) {
       expect(writeFileSyncStub).to.have.been.called;
       done();
     });
-  })
+  });
+
+  it('should be able to add a label to a task', function(done) {
+    var modifiedTodoistResp = _.cloneDeep(todoistResponse);
+    modifiedTodoistResp.Items[0].labels = [todoistLabelResponse.str.id];
+    readHistoryFromFileStub.returns({
+      seqNo: todoistResponse.seq_no,
+      tasks: {
+        44444444: {
+          habitrpg: {id: "44444445"},
+          todoist: todoistResponse.Items[0]
+        }
+      }
+    });
+    getTodoistSyncStub.callsArgWith(0, null, {body: modifiedTodoistResp});
+
+    sync.run(function() {
+      expect(habitapiStub.updateTask).to.have.been.called
+      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444445", taskGenerator(modifiedTodoistResp.Items[0]))
+      expect(writeFileSyncStub).to.have.been.called;
+      done();
+    });
+  });
+
+  it('should be able to change a task\'s label', function(done) {
+    var modifiedTodoistResp = _.cloneDeep(todoistResponse);
+    var historyTodoist = _.cloneDeep(todoistResponse);
+    modifiedTodoistResp.Items[0].labels = [todoistLabelResponse.str.id];
+    historyTodoist.Items[0].labels = [todoistLabelResponse.per.id];
+    readHistoryFromFileStub.returns({
+      seqNo: todoistResponse.seq_no,
+      tasks: {
+        44444444: {
+          habitrpg: {id: "44444445"},
+          todoist: historyTodoist.Items[0]
+        }
+      }
+    });
+    getTodoistSyncStub.callsArgWith(0, null, {body: modifiedTodoistResp});
+
+    sync.run(function() {
+      expect(habitapiStub.updateTask).to.have.been.called
+      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444445", taskGenerator(modifiedTodoistResp.Items[0]))
+      expect(writeFileSyncStub).to.have.been.called;
+      done();
+    });
+  });
 
   it('should save an updated history to file')
+
+  it('should delete the task on habitrpg when it is deleted from todolist', function(done) {
+    var modifiedTodoistResp = _.cloneDeep(todoistResponse)
+    modifiedTodoistResp.Items[0].is_deleted = true
+    readHistoryFromFileStub.returns({
+      seqNo: todoistResponse.seq_no,
+      tasks: {
+        44444444: {
+          habitrpg: {id: "44444445"},
+          todoist: todoistResponse.Items[0]
+        }
+      }
+    });
+    getTodoistSyncStub.callsArgWith(0, null, {body: modifiedTodoistResp});
+
+    sync.run(function() {
+      expect(habitapiStub.deleteTask).to.have.been.called
+      expect(habitapiStub.deleteTask).to.have.been.calledWithMatch(44444445)
+      expect(writeFileSyncStub).to.have.been.called;
+      done();
+    });
+  });
+
+  it('should should correctly parse all habit attribute labels from todoist', function(done) {
+    sync.getHabitAttributeIds(function(error, attributes) {
+      expect(attributes.str).to.contain(todoistLabelResponse.str.id);
+      expect(attributes.str).to.contain(todoistLabelResponse.strength.id);
+      expect(attributes.str).to.contain(todoistLabelResponse.physical.id);
+      expect(attributes.str).to.contain(todoistLabelResponse.phy.id);
+      expect(attributes.int).to.contain(todoistLabelResponse.int.id);
+      expect(attributes.int).to.contain(todoistLabelResponse.intelligence.id);
+      expect(attributes.int).to.contain(todoistLabelResponse.mental.id);
+      expect(attributes.int).to.contain(todoistLabelResponse.men.id);
+      expect(attributes.con).to.contain(todoistLabelResponse.con.id);
+      expect(attributes.con).to.contain(todoistLabelResponse.constitution.id);
+      expect(attributes.con).to.contain(todoistLabelResponse.social.id);
+      expect(attributes.con).to.contain(todoistLabelResponse.soc.id);
+      expect(attributes.per).to.contain(todoistLabelResponse.per.id);
+      expect(attributes.per).to.contain(todoistLabelResponse.perception.id);
+      expect(attributes.per).to.contain(todoistLabelResponse.other.id);
+      expect(attributes.per).to.contain(todoistLabelResponse.oth.id);
+      done();
+    })
+  })
+
 });

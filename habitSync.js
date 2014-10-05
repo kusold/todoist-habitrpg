@@ -45,7 +45,6 @@ function habitSync(options) {
 
 habitSync.prototype.run = function(done) {
   var self = this;
-  getHabitAttributeIds()
   history = self.readHistoryFromFile(self.historyPath);
   if(!history.tasks) {
     history.tasks = {};
@@ -55,6 +54,10 @@ habitSync.prototype.run = function(done) {
 
   async.waterfall([
     function(cb) {
+      self.getHabitAttributeIds(cb)
+    },
+    function(attributes, cb) {
+      habitAttributes = attributes;
       self.getTodoistSync(cb);
     },
     function(res, cb) {
@@ -70,12 +73,13 @@ habitSync.prototype.run = function(done) {
 }
 
 habitSync.prototype.findTasksThatNeedUpdating = function(newHistory, oldHistory) {
+  var self = this;
   var needToUpdate = []
   _.forEach(newHistory.tasks, function(item) {
     var old = oldHistory.tasks[item.todoist.id];
     var updateLabels = false;
     if(old) {
-      updateLabels = checkTodoistLabels(old.todoist.labels, item.todoist.labels);
+      updateLabels = self.checkTodoistLabels(old.todoist.labels, item.todoist.labels);
     }
     if(!old || !old.todoist || old.todoist.content != item.todoist.content ||
        old.todoist.checked != item.todoist.checked ||
@@ -93,6 +97,8 @@ habitSync.prototype.updateHistoryForTodoistItems = function(items) {
   _.forEach(items, function(item) {
     if(history.tasks[item.id]) {
       if(item.is_deleted) {
+        // TODO: Bring habit out above the forEach
+        // TODO: Determine if you want to delete the task in the habit sync function
         var habit = new habitapi(self.uid, self.token);
         var habitId = history.tasks[item.id].habitrpg.id;
         habit.user.deleteTask(habitId, function(response, error){})
@@ -149,7 +155,7 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
           completed: item.todoist.checked == true
         };
         if (item.todoist.labels.length > 0) {
-          attribute = checkForAttributes(item.todoist.labels);
+          attribute = self.checkForAttributes(item.todoist.labels);
         } 
         if(attribute) {
           task.attribute = attribute;
@@ -184,7 +190,7 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
   });
 }
 
-function getHabitAttributeIds() {
+habitSync.prototype.getHabitAttributeIds = function(callback) {
   // Gets a list of label ids and puts
   // them in an object if they correspond
   // to HabitRPG attributes (str, int, etc)
@@ -194,7 +200,7 @@ function getHabitAttributeIds() {
   request.post('https://api.todoist.com/API/getLabels')
 	 .send('token=' + self.todoist)
    .end(function(err, res) {
-     labelObject = res.body;
+     var labelObject = res.body;
      for(var l in labelObject) {
       labels[l] = labelObject[l].id;
      }
@@ -217,11 +223,11 @@ function getHabitAttributeIds() {
       }
     }
 
-    habitAttributes = attributes;
+    callback(null, attributes)
   });
 }
 
-function checkForAttributes(labels) {
+habitSync.prototype.checkForAttributes = function(labels) {
   // Cycle through todoist labels
   // For each label id, check it against the ids stored in habitAttributes
   // If a match is found, return it
@@ -237,7 +243,7 @@ function checkForAttributes(labels) {
   }
 }
 
-function checkTodoistLabels(oldLabel, newLabel) {
+habitSync.prototype.checkTodoistLabels = function(oldLabel, newLabel) {
   // Compares ids of todoist labels to determine
   // if the item needs updating
   
