@@ -37,6 +37,11 @@ function main() {
     }
   }
   
-  var sync = new habitSync({uid: program.uid, token: program.token, historyPath: program.file});
-  sync.Run();
+  var sync = new habitSync({uid: program.uid, token: program.token, todoist: program.todoist, historyPath: program.file});
+  sync.run(function(err) {
+    if(err) {
+      console.log('Sync failed with error: ' + err)
+    }
+    console.log('Sync completed successfully.')
+  });
 }

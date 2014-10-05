@@ -67,6 +67,9 @@ habitSync.prototype.run = function(done) {
       self.syncItemsToHabitRpg(changedTasks, cb);
     }
   ], function(err, newHistory) {
+    if(err) {
+      return done(err);
+    }
     fs.writeFileSync(self.historyPath, JSON.stringify(newHistory));
     done();
   });

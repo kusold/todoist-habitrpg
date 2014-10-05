@@ -37,7 +37,7 @@
     }
   ],
   "bin": {
-    "todoist-habitrpg": "./index.js"
+    "todoist-habitrpg": "./main.js"
   },
   "os": [
     "darwin",
@@ -46,7 +46,7 @@
   ],
   "license": "GPL v3",
   "dependencies": {
-    "habitrpg-api": "0.0.1",
+    "habitrpg-api": "~0.1.0",
     "commander": "~2.2.0",
     "superagent": "~0.18.0",
     "async": "~0.9.0",
