@@ -1,4 +1,7 @@
 # Todist - HabitRPG sync
+
+[![Build Status](https://travis-ci.org/Kusold/todoist-habitrpg.svg?branch=master)](https://travis-ci.org/Kusold/todoist-habitrpg)
+
 This is a small utility to help you keep your [Todoist](https://todoist.com) tasks in sync with [HabitRPG](https://habitrpg.com).
 
 ## Installation
