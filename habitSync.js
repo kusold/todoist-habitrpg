@@ -145,15 +145,33 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
   async.eachSeries(items, function(item, next) {
     async.waterfall([
       function(cb) {
-        var dueDate, attribute;
+        var dueDate, 
+            attribute, 
+            taskType = 'todo',
+            repeat;
         if(item.todoist.due_date_utc) {
           dueDate = new Date(item.todoist.due_date_utc);
         }
+
+        if(item.todoist.date_string.match(/^ev(ery | )/i)) {
+            taskType = 'daily';
+            repeat = {
+              "su": false,
+              "s": false,
+              "f": false,
+              "th": false,
+              "w": false,
+              "t": false,
+              "m": false
+            }
+        }
+        
         var task = {
           text: item.todoist.content,
           dateCreated: new Date(item.todoist.date_added),
           date: dueDate,
-          type: 'todo',
+          type: taskType,
+          repeat: repeat,
           completed: item.todoist.checked == true
         };
         if (item.todoist.labels.length > 0) {
