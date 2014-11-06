@@ -202,6 +202,10 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
           todoist: item.todoist,
           habitrpg: res.body
         }
+        // Adds date to habitrpg record if type is daily
+        if(res.body.type == "daily") {
+          history.tasks[item.todoist.id].habitrpg.date = new Date(item.todoist.due_date_utc);
+        }
         cb()
       }
     ], next)
