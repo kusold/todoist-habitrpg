@@ -155,7 +155,6 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
 
         if(item.todoist.date_string.match(/^ev(ery | )/i)) {
             taskType = 'daily';
-            console.log(item.todoist.date_string);
             repeat = {
               "su": item.todoist.date_string.match(/s($| |,|u)/i) && true,
               "s":  item.todoist.date_string.match(/sa($| |,|t)/i) && true,
@@ -165,7 +164,6 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
               "t":  item.todoist.date_string.match(/t($| |,|u)/i) && true,
               "m":  item.todoist.date_string.match(/m($| |,|o)/i) && true
             }
-            console.log(repeat);
         }
         
         var task = {
