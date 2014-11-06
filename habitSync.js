@@ -153,16 +153,19 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
           dueDate = new Date(item.todoist.due_date_utc);
         }
 
-        if(item.todoist.date_string.match(/^ev(ery | )/i)) {
+        var dateString = item.todoist.date_string;
+        if(dateString.match(/^ev(ery | )/i)) {
             taskType = 'daily';
+            var noStartDate = !(dateString.match(/(after|starting)/));
+
             repeat = {
-              "su": !!(item.todoist.date_string.match(/s($| |,|u)/i)),
-              "s":  !!(item.todoist.date_string.match(/sa($| |,|t)/i)),
-              "f":  !!(item.todoist.date_string.match(/f($| |,|r)/i)),
-              "th": !!(item.todoist.date_string.match(/th($| |,|u)/i)),
-              "w":  !!(item.todoist.date_string.match(/w($| |,|e)/i)),
-              "t":  !!(item.todoist.date_string.match(/t($| |,|u)/i)),
-              "m":  !!(item.todoist.date_string.match(/m($| |,|o)/i))
+              "su": noStartDate && !!(dateString.match(/s($| |,|u)/i)),
+              "s":  noStartDate && !!(dateString.match(/sa($| |,|t)/i)),
+              "f":  noStartDate && !!(dateString.match(/f($| |,|r)/i)),
+              "th": noStartDate && !!(dateString.match(/th($| |,|u)/i)),
+              "w":  noStartDate && !!(dateString.match(/w($| |,|e)/i)),
+              "t":  noStartDate && !!(dateString.match(/t($| |,|u)/i)),
+              "m":  noStartDate && !!(dateString.match(/m($| |,|o)/i))
             }
         }
         
