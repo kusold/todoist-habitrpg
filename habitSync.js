@@ -155,9 +155,6 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
 
         if(item.todoist.date_string.match(/^ev(ery | )/i)) {
             taskType = 'daily';
-            //var noStartingDate = !(item.todoist.date_string.match(/^ev(ery)? ([0-68-9] )?day(s)? starting /));
-            //console.log(item.todoist.date_string);
-            //console.log(noStartingDate);
             repeat = {
               "su": !!(item.todoist.date_string.match(/s($| |,|u)/i)),
               "s":  !!(item.todoist.date_string.match(/sa($| |,|t)/i)),
