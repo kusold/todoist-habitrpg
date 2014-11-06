@@ -156,15 +156,15 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
         var dateString = item.todoist.date_string;
         if(dateString.match(/^ev(ery | )/i)) {
             taskType = 'daily';
-            var noStartDate = !(dateString.match(/(after|starting)/));
-            var weekday = !!(dateString.match(/^ev(ery)? (week)?day/));
-            var weekend = !!(dateString.match(/^ev(ery)? day/))
+            var noStartDate = !(dateString.match(/(after|starting|\d(st|nd|rd|th))/i));
+            var weekday = !!(dateString.match(/^ev(ery)? (week)?day/i));
+            var weekend = !!(dateString.match(/^ev(ery)? day/i))
 
             repeat = {
               "su": noStartDate && (weekend || !!(dateString.match(/s($| |,|u)/i))),
               "s":  noStartDate && (weekend || !!(dateString.match(/sa($| |,|t)/i))),
               "f":  noStartDate && (weekday || !!(dateString.match(/f($| |,|r)/i))),
-              "th": noStartDate && (weekday || !!(dateString.match(/[a-z, ]th($| |,|u)/i))),
+              "th": noStartDate && (weekday || !!(dateString.match(/th($| |,|u)/i))),
               "w":  noStartDate && (weekday || !!(dateString.match(/w($| |,|e)/i))),
               "t":  noStartDate && (weekday || !!(dateString.match(/t($| |,|u)/i))),
               "m":  noStartDate && (weekday || !!(dateString.match(/m($| |,|o)/i)))
