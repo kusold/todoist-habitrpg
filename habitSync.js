@@ -156,7 +156,7 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
         var dateString = item.todoist.date_string;
         if(dateString.match(/^ev(ery | )/i)) {
             taskType = 'daily';
-            var noStartDate = !(dateString.match(/(after|starting|\d(st|nd|rd|th))/i));
+            var noStartDate = !(dateString.match(/(after|starting|\d+(st|nd|rd|th)|(first|second|third))/i));
             var weekday = !!(dateString.match(/^ev(ery)? (week)?day/i));
             var weekend = !!(dateString.match(/^ev(ery)? day/i))
 
