@@ -155,15 +155,17 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
 
         if(item.todoist.date_string.match(/^ev(ery | )/i)) {
             taskType = 'daily';
+            console.log(item.todoist.date_string);
             repeat = {
-              "su": (item.todoist.date_string.match(/s($| |,|u)/i) && true) || false,
-              "s": (item.todoist.date_string.match(/sa($| |,|t)/i) && true) || false,
-              "f": (item.todoist.date_string.match(/f($| |,|r)/i) && true) || false,
-              "th": (item.todoist.date_string.match(/th($| |,|u)/i) && true) || false,
-              "w": (item.todoist.date_string.match(/w($| |,|e)/i) && true) || false,
-              "t": (item.todoist.date_string.match(/t($| |,|u)/i) && true) || false,
-              "m": (item.todoist.date_string.match(/m($| |,|o)/i) && true) || false
+              "su": item.todoist.date_string.match(/s($| |,|u)/i) && true,
+              "s":  item.todoist.date_string.match(/sa($| |,|t)/i) && true,
+              "f":  item.todoist.date_string.match(/f($| |,|r)/i) && true,
+              "th": item.todoist.date_string.match(/th($| |,|u)/i) && true,
+              "w":  item.todoist.date_string.match(/w($| |,|e)/i) && true,
+              "t":  item.todoist.date_string.match(/t($| |,|u)/i) && true,
+              "m":  item.todoist.date_string.match(/m($| |,|o)/i) && true
             }
+            console.log(repeat);
         }
         
         var task = {
