@@ -155,6 +155,9 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
 
         if(item.todoist.date_string.match(/^ev(ery | )/i)) {
             taskType = 'daily';
+            //var noStartingDate = !(item.todoist.date_string.match(/^ev(ery)? ([0-68-9] )?day(s)? starting /));
+            //console.log(item.todoist.date_string);
+            //console.log(noStartingDate);
             repeat = {
               "su": !!(item.todoist.date_string.match(/s($| |,|u)/i)),
               "s":  !!(item.todoist.date_string.match(/sa($| |,|t)/i)),
@@ -182,11 +185,23 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
         }
         
         if(item.habitrpg) {
-          // Checks if the complete status has changed
-          if((task.completed != item.habitrpg.completed && item.habitrpg.completed !== undefined) ||
-             (task.completed == true && item.habitrpg.completed === undefined)) {
-            var direction = task.completed == true;
-            habit.updateTaskScore(item.habitrpg.id, direction, function(response, error){ });
+          if(task.type == "todo") { 
+            // Checks if the complete status has changed
+            if((task.completed != item.habitrpg.completed && item.habitrpg.completed !== undefined)
+             || (task.completed == true && item.habitrpg.completed === undefined)) {
+              var direction = task.completed == true;
+              habit.updateTaskScore(item.habitrpg.id, direction, function(response, error){ });
+            }
+          } else if(task.type == "daily") {
+            
+            var oldDate = new Date(item.habitrpg.date);
+
+            // Checks if the due date has changed, indicating that it was clicked in Todoist
+            if(task.date > oldDate) {
+              var direction = true;
+              task.completed = true;
+              habit.updateTaskScore(item.habitrpg.id, direction, function(response, error){ });
+            }
           }
           habit.updateTask(item.habitrpg.id, task, function(err, res) {
             cb(err, res)
