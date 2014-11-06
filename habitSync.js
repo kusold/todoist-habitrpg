@@ -162,7 +162,7 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
               "su": noStartDate && !!(dateString.match(/s($| |,|u)/i)),
               "s":  noStartDate && !!(dateString.match(/sa($| |,|t)/i)),
               "f":  noStartDate && !!(dateString.match(/f($| |,|r)/i)),
-              "th": noStartDate && !!(dateString.match(/th($| |,|u)/i)),
+              "th": noStartDate && !!(dateString.match(/[a-z, ]th($| |,|u)/i)),
               "w":  noStartDate && !!(dateString.match(/w($| |,|e)/i)),
               "t":  noStartDate && !!(dateString.match(/t($| |,|u)/i)),
               "m":  noStartDate && !!(dateString.match(/m($| |,|o)/i))
