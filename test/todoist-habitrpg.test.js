@@ -176,7 +176,8 @@ describe('todoist-habitrpg', function (done) {
       dateCreated: new Date(todoistItem.date_added),
       date: new Date(todoistItem.due_date_utc),
       type: 'todo',
-      completed: todoistItem.checked == true
+      completed: todoistItem.checked == true,
+      repeat: undefined
     }
   }
 
@@ -187,8 +188,8 @@ describe('todoist-habitrpg', function (done) {
     getTodoistSyncStub = sinon.stub(sync, 'getTodoistSync');
     syncItemsToHabitRpgSpy = sinon.spy(sync, 'syncItemsToHabitRpg');
     habitapiStub = sinon.stub(habitapi.prototype);
-    habitapiStub.createTask.yields(null, {});
-    habitapiStub.updateTask.yields(null, {});
+    habitapiStub.createTask.yields(null, {body: {type: 'todo'}});
+    habitapiStub.updateTask.yields(null, {body: {type: 'todo'}});
     requestStub = sinon.stub(request.Request.prototype, 'end');
     // TODO: If we add another superagent call, this will need
     // to be improved to look at the URL.
@@ -226,7 +227,7 @@ describe('todoist-habitrpg', function (done) {
     expect(thrpgSync.historyPath).to.match(/\.todoist-habitrpg\.json/);
   });
 
-  it('should send Todoist tasks to HabitRPG if there was no history file found', function(done) { 
+  it('should send Todoist tasks to HabitRPG if there was no history file found', function(done) {
     readHistoryFromFileStub.returns({});
     getTodoistSyncStub.callsArgWith(0, null, {body: todoistResponse});
 

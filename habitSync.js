@@ -145,8 +145,8 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
   async.eachSeries(items, function(item, next) {
     async.waterfall([
       function(cb) {
-        var dueDate, 
-            attribute, 
+        var dueDate,
+            attribute,
             taskType = 'todo',
             repeat;
         if(item.todoist.due_date_utc) {
@@ -170,7 +170,7 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
               "m":  noStartDate && (weekday || !!(dateString.match(/m($| |,|o)/i)))
             }
         }
-        
+
         var task = {
           text: item.todoist.content,
           dateCreated: new Date(item.todoist.date_added),
@@ -181,13 +181,13 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
         };
         if (item.todoist.labels.length > 0) {
           attribute = self.checkForAttributes(item.todoist.labels);
-        } 
+        }
         if(attribute) {
           task.attribute = attribute;
         }
-        
+
         if(item.habitrpg) {
-          if(task.type == "todo") { 
+          if(task.type == "todo") {
             // Checks if the complete status has changed
             if((task.completed != item.habitrpg.completed && item.habitrpg.completed !== undefined)
              || (task.completed == true && item.habitrpg.completed === undefined)) {
@@ -195,7 +195,7 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
               habit.updateTaskScore(item.habitrpg.id, direction, function(response, error){ });
             }
           } else if(task.type == "daily") {
-            
+
             var oldDate = new Date(item.habitrpg.date);
 
             // Checks if the due date has changed, indicating that it was clicked in Todoist
@@ -249,16 +249,16 @@ habitSync.prototype.getHabitAttributeIds = function(callback) {
     var attributes = {str: [], int: [], con: [], per: []}
 
     for(var l in labels) {
-      if (l == 'str' || l == 'strength' 
+      if (l == 'str' || l == 'strength'
             || l == 'physical' || l == 'phy') {
         attributes.str.push(labels[l]);
-      } else if (l == 'int' || l == 'intelligence' 
+      } else if (l == 'int' || l == 'intelligence'
             || l == 'mental' || l == 'men') {
         attributes.int.push(labels[l]);
-      } else if (l == 'con' || l == 'constitution' 
+      } else if (l == 'con' || l == 'constitution'
             || l == 'social' || l == 'soc') {
         attributes.con.push(labels[l]);
-      } else if (l == 'per' || l == 'perception' 
+      } else if (l == 'per' || l == 'perception'
             || l == 'other' || l == 'oth') {
         attributes.per.push(labels[l]);
       }
@@ -273,7 +273,7 @@ habitSync.prototype.checkForAttributes = function(labels) {
   // For each label id, check it against the ids stored in habitAttributes
   // If a match is found, return it
 
-  for(var label in labels) { 
+  for(var label in labels) {
     for(var att in habitAttributes) {
       for(var num in habitAttributes[att]) {
         if(habitAttributes[att][num] == labels[label]) {
@@ -287,7 +287,7 @@ habitSync.prototype.checkForAttributes = function(labels) {
 habitSync.prototype.checkTodoistLabels = function(oldLabel, newLabel) {
   // Compares ids of todoist labels to determine
   // if the item needs updating
-  
+
   if(oldLabel.length != newLabel.length) {
     return true;
   }
