@@ -295,13 +295,13 @@ habitSync.prototype.parseTodoistRepeatingDate = function(dateString) {
       var weekend = !!(dateString.match(/^ev(ery)? (week)?end/i));
 
       repeat = {
-        "su": noStartDate && (everyday || weekend || !!(dateString.match(/s($| |,|u)/i))),
-        "s":  noStartDate && (everyday || weekend || !!(dateString.match(/sa($| |,|t)/i))),
-        "f":  noStartDate && (everyday || weekday || !!(dateString.match(/f($| |,|r)/i))),
-        "th": noStartDate && (everyday || weekday || !!(dateString.match(/th($| |,|u)/i))),
-        "w":  noStartDate && (everyday || weekday || (!!(dateString.match(/w($| |,|e)/i)) && !weekend)), // Otherwise also matches weekend
+        "su": noStartDate && (everyday || weekend || !!(dateString.match(/\bs($| |,|u)/i))),
+        "s":  noStartDate && (everyday || weekend || !!(dateString.match(/\bsa($| |,|t)/i))),
+        "f":  noStartDate && (everyday || weekday || !!(dateString.match(/\bf($| |,|r)/i))),
+        "th": noStartDate && (everyday || weekday || !!(dateString.match(/\bth($| |,|u)/i))),
+        "w":  noStartDate && (everyday || weekday || (!!(dateString.match(/\bw($| |,|e)/i)) && !weekend)), // Otherwise also matches weekend
         "t":  noStartDate && (everyday || weekday || !!(dateString.match(/\bt($| |,|u)/i))),
-        "m":  noStartDate && (everyday || weekday || !!(dateString.match(/m($| |,|o)/i)))
+        "m":  noStartDate && (everyday || weekday || !!(dateString.match(/\bm($| |,|o)/i)))
       };
   }
   return {type: type, repeat: repeat};
