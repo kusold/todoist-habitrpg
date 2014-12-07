@@ -54,7 +54,7 @@ habitSync.prototype.run = function(done) {
 
   async.waterfall([
     function(cb) {
-      self.getHabitAttributeIds(cb)
+      self.getHabitAttributeIds(cb);
     },
     function(attributes, cb) {
       habitAttributes = attributes;
@@ -73,11 +73,11 @@ habitSync.prototype.run = function(done) {
     fs.writeFileSync(self.historyPath, JSON.stringify(newHistory));
     done();
   });
-}
+};
 
 habitSync.prototype.findTasksThatNeedUpdating = function(newHistory, oldHistory) {
   var self = this;
-  var needToUpdate = []
+  var needToUpdate = [];
   _.forEach(newHistory.tasks, function(item) {
     var old = oldHistory.tasks[item.todoist.id];
     var updateLabels = false;
@@ -93,7 +93,7 @@ habitSync.prototype.findTasksThatNeedUpdating = function(newHistory, oldHistory)
     }
   });
   return needToUpdate;
-}
+};
 
 habitSync.prototype.updateHistoryForTodoistItems = function(items) {
   var self = this;
@@ -103,7 +103,7 @@ habitSync.prototype.updateHistoryForTodoistItems = function(items) {
       if(item.is_deleted) {
         // TODO: Determine if you want to delete the task in the habit sync function
         var habitId = history.tasks[item.id].habitrpg.id;
-        habit.deleteTask(habitId, function(response, error){})
+        habit.deleteTask(habitId, function(response, error){});
 
         // Deletes record from sync history
         delete history.tasks[item.id];
@@ -112,10 +112,10 @@ habitSync.prototype.updateHistoryForTodoistItems = function(items) {
       }
     } else if(!item.is_deleted) {
       // Only adds item to history if it was not deleted before syncing to habitrpg
-      history.tasks[item.id] = {todoist: item}
+      history.tasks[item.id] = {todoist: item};
     }
   });
-}
+};
 
 habitSync.prototype.readHistoryFromFile = function(path) {
   var history = {};
@@ -124,7 +124,7 @@ habitSync.prototype.readHistoryFromFile = function(path) {
     history = JSON.parse(data);
   }
   return history;
-}
+};
 
 habitSync.prototype.getTodoistSync = function(cb) {
   var self = this;
@@ -136,7 +136,7 @@ habitSync.prototype.getTodoistSync = function(cb) {
    .end(function(err, res) {
      cb(err,res);
    });
-}
+};
 
 habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
   var self = this;
@@ -189,9 +189,9 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
         if(item.habitrpg) {
           if(task.type == "todo") {
             // Checks if the complete status has changed
-            if((task.completed != item.habitrpg.completed && item.habitrpg.completed !== undefined)
-             || (task.completed == true && item.habitrpg.completed === undefined)) {
-              var direction = task.completed == true;
+            if((task.completed != item.habitrpg.completed && item.habitrpg.completed !== undefined) ||
+              (task.completed === true && item.habitrpg.completed === undefined)) {
+              var direction = task.completed === true;
               habit.updateTaskScore(item.habitrpg.id, direction, function(response, error){ });
             }
           } else if(task.type == "daily") {
@@ -206,11 +206,11 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
             }
           }
           habit.updateTask(item.habitrpg.id, task, function(err, res) {
-            cb(err, res)
+            cb(err, res);
           });
         } else {
           habit.createTask(task, function(err, res) {
-            cb(err, res)
+            cb(err, res);
           });
         }
       },
@@ -218,18 +218,18 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
         history.tasks[item.todoist.id] = {
           todoist: item.todoist,
           habitrpg: res.body
-        }
+        };
         // Adds date to habitrpg record if type is daily
         if(res.body.type == "daily") {
           history.tasks[item.todoist.id].habitrpg.date = new Date(item.todoist.due_date_utc);
         }
-        cb()
+        cb();
       }
-    ], next)
+    ], next);
   }, function(err) {
     cb(err, history);
   });
-}
+};
 
 habitSync.prototype.getHabitAttributeIds = function(callback) {
   // Gets a list of label ids and puts
@@ -246,27 +246,27 @@ habitSync.prototype.getHabitAttributeIds = function(callback) {
       labels[l] = labelObject[l].id;
      }
 
-    var attributes = {str: [], int: [], con: [], per: []}
+    var attributes = {str: [], int: [], con: [], per: []};
 
     for(var l in labels) {
-      if (l == 'str' || l == 'strength'
-            || l == 'physical' || l == 'phy') {
+      if (l == 'str' || l == 'strength' ||
+        l == 'physical' || l == 'phy') {
         attributes.str.push(labels[l]);
-      } else if (l == 'int' || l == 'intelligence'
-            || l == 'mental' || l == 'men') {
+      } else if (l == 'int' || l == 'intelligence' ||
+        l == 'mental' || l == 'men') {
         attributes.int.push(labels[l]);
-      } else if (l == 'con' || l == 'constitution'
-            || l == 'social' || l == 'soc') {
+      } else if (l == 'con' || l == 'constitution' ||
+        l == 'social' || l == 'soc') {
         attributes.con.push(labels[l]);
-      } else if (l == 'per' || l == 'perception'
-            || l == 'other' || l == 'oth') {
+      } else if (l == 'per' || l == 'perception' ||
+        l == 'other' || l == 'oth') {
         attributes.per.push(labels[l]);
       }
     }
 
-    callback(null, attributes)
+    callback(null, attributes);
   });
-}
+};
 
 habitSync.prototype.checkForAttributes = function(labels) {
   // Cycle through todoist labels
@@ -282,7 +282,7 @@ habitSync.prototype.checkForAttributes = function(labels) {
       }
     }
   }
-}
+};
 
 habitSync.prototype.checkTodoistLabels = function(oldLabel, newLabel) {
   // Compares ids of todoist labels to determine
