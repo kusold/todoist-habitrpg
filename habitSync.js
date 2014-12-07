@@ -54,7 +54,7 @@ habitSync.prototype.run = function(done) {
 
   async.waterfall([
     function(cb) {
-      self.getHabitAttributeIds(cb)
+      self.getHabitAttributeIds(cb);
     },
     function(attributes, cb) {
       habitAttributes = attributes;
@@ -73,11 +73,11 @@ habitSync.prototype.run = function(done) {
     fs.writeFileSync(self.historyPath, JSON.stringify(newHistory));
     done();
   });
-}
+};
 
 habitSync.prototype.findTasksThatNeedUpdating = function(newHistory, oldHistory) {
   var self = this;
-  var needToUpdate = []
+  var needToUpdate = [];
   _.forEach(newHistory.tasks, function(item) {
     var old = oldHistory.tasks[item.todoist.id];
     var updateLabels = false;
@@ -93,7 +93,7 @@ habitSync.prototype.findTasksThatNeedUpdating = function(newHistory, oldHistory)
     }
   });
   return needToUpdate;
-}
+};
 
 habitSync.prototype.updateHistoryForTodoistItems = function(items) {
   var self = this;
@@ -103,7 +103,7 @@ habitSync.prototype.updateHistoryForTodoistItems = function(items) {
       if(item.is_deleted) {
         // TODO: Determine if you want to delete the task in the habit sync function
         var habitId = history.tasks[item.id].habitrpg.id;
-        habit.deleteTask(habitId, function(response, error){})
+        habit.deleteTask(habitId, function(response, error){});
 
         // Deletes record from sync history
         delete history.tasks[item.id];
@@ -112,10 +112,10 @@ habitSync.prototype.updateHistoryForTodoistItems = function(items) {
       }
     } else if(!item.is_deleted) {
       // Only adds item to history if it was not deleted before syncing to habitrpg
-      history.tasks[item.id] = {todoist: item}
+      history.tasks[item.id] = {todoist: item};
     }
   });
-}
+};
 
 habitSync.prototype.readHistoryFromFile = function(path) {
   var history = {};
@@ -124,7 +124,7 @@ habitSync.prototype.readHistoryFromFile = function(path) {
     history = JSON.parse(data);
   }
   return history;
-}
+};
 
 habitSync.prototype.getTodoistSync = function(cb) {
   var self = this;
@@ -136,7 +136,7 @@ habitSync.prototype.getTodoistSync = function(cb) {
    .end(function(err, res) {
      cb(err,res);
    });
-}
+};
 
 habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
   var self = this;
@@ -145,37 +145,54 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
   async.eachSeries(items, function(item, next) {
     async.waterfall([
       function(cb) {
-        var dueDate, attribute;
+        var dueDate,
+            attribute;
         if(item.todoist.due_date_utc) {
           dueDate = new Date(item.todoist.due_date_utc);
         }
+
+        var taskType = self.parseTodoistRepeatingDate(item.todoist.date_string);
+        var repeat = taskType.repeat;
         var task = {
           text: item.todoist.content,
           dateCreated: new Date(item.todoist.date_added),
           date: dueDate,
-          type: 'todo',
+          type: taskType.type,
+          repeat: taskType.repeat,
           completed: item.todoist.checked == true
         };
         if (item.todoist.labels.length > 0) {
           attribute = self.checkForAttributes(item.todoist.labels);
-        } 
+        }
         if(attribute) {
           task.attribute = attribute;
         }
-        
+
         if(item.habitrpg) {
-          // Checks if the complete status has changed
-          if((task.completed != item.habitrpg.completed && item.habitrpg.completed !== undefined) ||
-             (task.completed == true && item.habitrpg.completed === undefined)) {
-            var direction = task.completed == true;
-            habit.updateTaskScore(item.habitrpg.id, direction, function(response, error){ });
+          if(task.type == "todo") {
+            // Checks if the complete status has changed
+            if((task.completed != item.habitrpg.completed && item.habitrpg.completed !== undefined) ||
+              (task.completed === true && item.habitrpg.completed === undefined)) {
+              var direction = task.completed === true;
+              habit.updateTaskScore(item.habitrpg.id, direction, function(response, error){ });
+            }
+          } else if(task.type == "daily") {
+
+            var oldDate = new Date(item.habitrpg.date);
+
+            // Checks if the due date has changed, indicating that it was clicked in Todoist
+            if(task.date > oldDate) {
+              var direction = true;
+              task.completed = true;
+              habit.updateTaskScore(item.habitrpg.id, direction, function(response, error){ });
+            }
           }
           habit.updateTask(item.habitrpg.id, task, function(err, res) {
-            cb(err, res)
+            cb(err, res);
           });
         } else {
           habit.createTask(task, function(err, res) {
-            cb(err, res)
+            cb(err, res);
           });
         }
       },
@@ -183,14 +200,18 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
         history.tasks[item.todoist.id] = {
           todoist: item.todoist,
           habitrpg: res.body
+        };
+        // Adds date to habitrpg record if type is daily
+        if(res.body.type == "daily") {
+          history.tasks[item.todoist.id].habitrpg.date = new Date(item.todoist.due_date_utc);
         }
-        cb()
+        cb();
       }
-    ], next)
+    ], next);
   }, function(err) {
     cb(err, history);
   });
-}
+};
 
 habitSync.prototype.getHabitAttributeIds = function(callback) {
   // Gets a list of label ids and puts
@@ -207,34 +228,34 @@ habitSync.prototype.getHabitAttributeIds = function(callback) {
       labels[l] = labelObject[l].id;
      }
 
-    var attributes = {str: [], int: [], con: [], per: []}
+    var attributes = {str: [], int: [], con: [], per: []};
 
     for(var l in labels) {
-      if (l == 'str' || l == 'strength' 
-            || l == 'physical' || l == 'phy') {
+      if (l == 'str' || l == 'strength' ||
+        l == 'physical' || l == 'phy') {
         attributes.str.push(labels[l]);
-      } else if (l == 'int' || l == 'intelligence' 
-            || l == 'mental' || l == 'men') {
+      } else if (l == 'int' || l == 'intelligence' ||
+        l == 'mental' || l == 'men') {
         attributes.int.push(labels[l]);
-      } else if (l == 'con' || l == 'constitution' 
-            || l == 'social' || l == 'soc') {
+      } else if (l == 'con' || l == 'constitution' ||
+        l == 'social' || l == 'soc') {
         attributes.con.push(labels[l]);
-      } else if (l == 'per' || l == 'perception' 
-            || l == 'other' || l == 'oth') {
+      } else if (l == 'per' || l == 'perception' ||
+        l == 'other' || l == 'oth') {
         attributes.per.push(labels[l]);
       }
     }
 
-    callback(null, attributes)
+    callback(null, attributes);
   });
-}
+};
 
 habitSync.prototype.checkForAttributes = function(labels) {
   // Cycle through todoist labels
   // For each label id, check it against the ids stored in habitAttributes
   // If a match is found, return it
 
-  for(var label in labels) { 
+  for(var label in labels) {
     for(var att in habitAttributes) {
       for(var num in habitAttributes[att]) {
         if(habitAttributes[att][num] == labels[label]) {
@@ -243,12 +264,12 @@ habitSync.prototype.checkForAttributes = function(labels) {
       }
     }
   }
-}
+};
 
 habitSync.prototype.checkTodoistLabels = function(oldLabel, newLabel) {
   // Compares ids of todoist labels to determine
   // if the item needs updating
-  
+
   if(oldLabel.length != newLabel.length) {
     return true;
   }
@@ -260,6 +281,32 @@ habitSync.prototype.checkTodoistLabels = function(oldLabel, newLabel) {
   }
 
   return false;
-}
+};
+
+habitSync.prototype.parseTodoistRepeatingDate = function(dateString) {
+  var type = "todo";
+  var repeat;
+
+  var noStartDate = !(dateString.match(/(after|starting|last|\d+(st|nd|rd|th)|(first|second|third))/i));
+
+  if(dateString.match(/^ev(ery)? [^\d]/i) && noStartDate) {
+      type = 'daily';
+
+      var everyday = !!(dateString.match(/^ev(ery)? [^(week)]?day/i));
+      var weekday = !!(dateString.match(/^ev(ery)? (week)?day/i));
+      var weekend = !!(dateString.match(/^ev(ery)? (week)?end/i));
+
+      repeat = {
+        "su": everyday || weekend || !!(dateString.match(/\bs($| |,|u)/i)),
+        "s":  everyday || weekend || !!(dateString.match(/\bsa($| |,|t)/i)),
+        "f":  everyday || weekday || !!(dateString.match(/\bf($| |,|r)/i)),
+        "th": everyday || weekday || !!(dateString.match(/\bth($| |,|u)/i)),
+        "w":  everyday || weekday || (!!(dateString.match(/\bw($| |,|e)/i)) && !weekend), // Otherwise also matches weekend
+        "t":  everyday || weekday || !!(dateString.match(/\bt($| |,|u)/i)),
+        "m":  everyday || weekday || !!(dateString.match(/\bm($| |,|o)/i))
+      };
+  }
+  return {type: type, repeat: repeat};
+};
 
 module.exports = habitSync;
