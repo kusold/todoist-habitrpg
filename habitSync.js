@@ -287,21 +287,23 @@ habitSync.prototype.parseTodoistRepeatingDate = function(dateString) {
   var type = "todo";
   var repeat;
 
-  if(dateString.match(/^ev(ery)? [^\d]/i)) {
+  var noStartDate = !(dateString.match(/(after|starting|last|\d+(st|nd|rd|th)|(first|second|third))/i));
+
+  if(dateString.match(/^ev(ery)? [^\d]/i) && noStartDate) {
       type = 'daily';
-      var noStartDate = !(dateString.match(/(after|starting|\d+(st|nd|rd|th)|(first|second|third))/i));
+
       var everyday = !!(dateString.match(/^ev(ery)? [^(week)]?day/i));
       var weekday = !!(dateString.match(/^ev(ery)? (week)?day/i));
       var weekend = !!(dateString.match(/^ev(ery)? (week)?end/i));
 
       repeat = {
-        "su": noStartDate && (everyday || weekend || !!(dateString.match(/\bs($| |,|u)/i))),
-        "s":  noStartDate && (everyday || weekend || !!(dateString.match(/\bsa($| |,|t)/i))),
-        "f":  noStartDate && (everyday || weekday || !!(dateString.match(/\bf($| |,|r)/i))),
-        "th": noStartDate && (everyday || weekday || !!(dateString.match(/\bth($| |,|u)/i))),
-        "w":  noStartDate && (everyday || weekday || (!!(dateString.match(/\bw($| |,|e)/i)) && !weekend)), // Otherwise also matches weekend
-        "t":  noStartDate && (everyday || weekday || !!(dateString.match(/\bt($| |,|u)/i))),
-        "m":  noStartDate && (everyday || weekday || !!(dateString.match(/\bm($| |,|o)/i)))
+        "su": everyday || weekend || !!(dateString.match(/\bs($| |,|u)/i)),
+        "s":  everyday || weekend || !!(dateString.match(/\bsa($| |,|t)/i)),
+        "f":  everyday || weekday || !!(dateString.match(/\bf($| |,|r)/i)),
+        "th": everyday || weekday || !!(dateString.match(/\bth($| |,|u)/i)),
+        "w":  everyday || weekday || (!!(dateString.match(/\bw($| |,|e)/i)) && !weekend), // Otherwise also matches weekend
+        "t":  everyday || weekday || !!(dateString.match(/\bt($| |,|u)/i)),
+        "m":  everyday || weekday || !!(dateString.match(/\bm($| |,|o)/i))
       };
   }
   return {type: type, repeat: repeat};

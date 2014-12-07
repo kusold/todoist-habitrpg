@@ -590,6 +590,11 @@ describe('todoist-habitrpg', function (done) {
       expect(actual.type, 'ev day at 1pm').to.equal('daily');
       expect(actual.repeat, 'ev day at 1pm').to.deep.equal({su: true, m: true, t: true, w: true, th: true, f: true, s: true});
 
+      // --------------------------------------------------
+      // Date strings that Todoist considers as repeating,
+      // but this sync currently doesn't.
+      // --------------------------------------------------
+
       // every 7th day in a month
       actual = sync.parseTodoistRepeatingDate('ev 7');
       expect(actual.type, 'ev 7').to.equal('todo');
@@ -599,14 +604,30 @@ describe('todoist-habitrpg', function (done) {
       expect(actual.type, 'every 7th day in a month').to.equal('todo');
       expect(actual.repeat, 'every 7th day in a month').to.undefined;
 
-      // ev 7 may
-      // ev 3 days starting next monday
-      // every day at 14:30 starting 1 Jan
-      // every 13 may
-      // ev weekday
-      // every last day
-      // every 2nd monday
+      actual = sync.parseTodoistRepeatingDate('ev 7 may');
+      expect(actual.type, 'ev 7 may').to.equal('todo');
+      expect(actual.repeat, 'ev 7 may').to.undefined;
 
+      actual = sync.parseTodoistRepeatingDate('ev 3 days starting next monday');
+      expect(actual.type, 'ev 3 days starting next monday').to.equal('todo');
+      expect(actual.repeat, 'ev 3 days starting next monday').to.undefined;
+
+      actual = sync.parseTodoistRepeatingDate('every day at 14:30 starting 1 Jan');
+      expect(actual.type, 'every day at 14:30 starting 1 Jan').to.equal('todo');
+      expect(actual.repeat, 'every day at 14:30 starting 1 Jan').to.undefined;
+
+
+      actual = sync.parseTodoistRepeatingDate('every 13 may');
+      expect(actual.type, 'every 13 may').to.equal('todo');
+      expect(actual.repeat, 'every 13 may').to.undefined;
+
+      actual = sync.parseTodoistRepeatingDate('every last day');
+      expect(actual.type, 'every last day').to.equal('todo');
+      expect(actual.repeat, 'every last day').to.undefined;
+
+      actual = sync.parseTodoistRepeatingDate('every 2nd monday');
+      expect(actual.type, 'every 2nd monday').to.equal('todo');
+      expect(actual.repeat, 'every 2nd monday').to.undefined;
     })
   })
 });
