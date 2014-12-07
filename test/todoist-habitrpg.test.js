@@ -488,30 +488,58 @@ describe('todoist-habitrpg', function (done) {
       expect(actual.type, 'Sunday').to.equal('daily');
       expect(actual.repeat, 'Sunday').to.deep.equal({su: true, m: false, t: false, w: false, th: false, f: false, s: false});
 
+      actual = sync.parseTodoistRepeatingDate('every s');
+      expect(actual.type, 'S').to.equal('daily');
+      expect(actual.repeat, 'S').to.deep.equal({su: true, m: false, t: false, w: false, th: false, f: false, s: false});
+
       actual = sync.parseTodoistRepeatingDate('every monday');
       expect(actual.type, 'Monday').to.equal('daily');
       expect(actual.repeat, 'Monday').to.deep.equal({su: false, m: true, t: false, w: false, th: false, f: false, s: false});
+
+      actual = sync.parseTodoistRepeatingDate('every m');
+      expect(actual.type, 'M').to.equal('daily');
+      expect(actual.repeat, 'M').to.deep.equal({su: false, m: true, t: false, w: false, th: false, f: false, s: false});
 
       actual = sync.parseTodoistRepeatingDate('every tuesday');
       expect(actual.type, 'Tuesday').to.equal('daily');
       expect(actual.repeat, 'Tuesday').to.deep.equal({su: false, m: false, t: true, w: false, th: false, f: false, s: false});
 
+      actual = sync.parseTodoistRepeatingDate('every t');
+      expect(actual.type, 'T').to.equal('daily');
+      expect(actual.repeat, 'T').to.deep.equal({su: false, m: false, t: true, w: false, th: false, f: false, s: false});
+
       actual = sync.parseTodoistRepeatingDate('every wednesday');
       expect(actual.type, 'Wednesday').to.equal('daily');
       expect(actual.repeat, 'Wednesday').to.deep.equal({su: false, m: false, t: false, w: true, th: false, f: false, s: false});
+
+      actual = sync.parseTodoistRepeatingDate('every w');
+      expect(actual.type, 'W').to.equal('daily');
+      expect(actual.repeat, 'W').to.deep.equal({su: false, m: false, t: false, w: true, th: false, f: false, s: false});
 
       actual = sync.parseTodoistRepeatingDate('every thursday');
       expect(actual.type, 'Thursday').to.equal('daily');
       expect(actual.repeat, 'Thursday').to.deep.equal({su: false, m: false, t: false, w: false, th: true, f: false, s: false});
 
+      actual = sync.parseTodoistRepeatingDate('every th');
+      expect(actual.type, 'Th').to.equal('daily');
+      expect(actual.repeat, 'Th').to.deep.equal({su: false, m: false, t: false, w: false, th: true, f: false, s: false});
+
       actual = sync.parseTodoistRepeatingDate('every friday');
-      expect(actual.type, 'Fruday').to.equal('daily');
+      expect(actual.type, 'Friday').to.equal('daily');
       expect(actual.repeat, 'Friday').to.deep.equal({su: false, m: false, t: false, w: false, th: false, f: true, s: false});
+
+      actual = sync.parseTodoistRepeatingDate('every f');
+      expect(actual.type, 'F').to.equal('daily');
+      expect(actual.repeat, 'F').to.deep.equal({su: false, m: false, t: false, w: false, th: false, f: true, s: false});
 
       actual = sync.parseTodoistRepeatingDate('every saturday');
       expect(actual.type, 'Saturday').to.equal('daily');
       expect(actual.repeat, 'Saturday').to.deep.equal({su: false, m: false, t: false, w: false, th: false, f: false, s: true});
-    })
+
+      actual = sync.parseTodoistRepeatingDate('every sa');
+      expect(actual.type, 'Sa').to.equal('daily');
+      expect(actual.repeat, 'Sa').to.deep.equal({su: false, m: false, t: false, w: false, th: false, f: false, s: true});
+    });
 
     it('should parse weekday tasks as a daily that repeats M-F')
 

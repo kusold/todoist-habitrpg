@@ -299,7 +299,7 @@ habitSync.prototype.parseTodoistRepeatingDate = function(dateString) {
         "f":  noStartDate && (weekday || !!(dateString.match(/f($| |,|r)/i))),
         "th": noStartDate && (weekday || !!(dateString.match(/th($| |,|u)/i))),
         "w":  noStartDate && (weekday || !!(dateString.match(/w($| |,|e)/i))),
-        "t":  noStartDate && (weekday || !!(dateString.match(/t($| |,|u)/i))),
+        "t":  noStartDate && (weekday || !!(dateString.match(/\bt($| |,|u)/i))),
         "m":  noStartDate && (weekday || !!(dateString.match(/m($| |,|o)/i)))
       };
   }
