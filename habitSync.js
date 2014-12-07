@@ -287,7 +287,7 @@ habitSync.prototype.parseTodoistRepeatingDate = function(dateString) {
   var type = "todo";
   var repeat;
 
-  if(dateString.match(/^ev(ery | )/i)) {
+  if(dateString.match(/^ev(ery)? [^\d]/i)) {
       type = 'daily';
       var noStartDate = !(dateString.match(/(after|starting|\d+(st|nd|rd|th)|(first|second|third))/i));
       var everyday = !!(dateString.match(/^ev(ery)? [^(week)]?day/i));
