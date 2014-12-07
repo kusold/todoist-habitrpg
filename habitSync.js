@@ -290,17 +290,18 @@ habitSync.prototype.parseTodoistRepeatingDate = function(dateString) {
   if(dateString.match(/^ev(ery | )/i)) {
       type = 'daily';
       var noStartDate = !(dateString.match(/(after|starting|\d+(st|nd|rd|th)|(first|second|third))/i));
-      var weekday = !!(dateString.match(/^ev(ery)? (week)?day/i)); // Double !!?
-      var weekend = !!(dateString.match(/^ev(ery)? day/i));
+      var everyday = !!(dateString.match(/^ev(ery)? [^(week)]?day/i));
+      var weekday = !!(dateString.match(/^ev(ery)? (week)?day/i));
+      var weekend = !!(dateString.match(/^ev(ery)? (week)?end/i));
 
       repeat = {
-        "su": noStartDate && (weekend || !!(dateString.match(/s($| |,|u)/i))),
-        "s":  noStartDate && (weekend || !!(dateString.match(/sa($| |,|t)/i))),
-        "f":  noStartDate && (weekday || !!(dateString.match(/f($| |,|r)/i))),
-        "th": noStartDate && (weekday || !!(dateString.match(/th($| |,|u)/i))),
-        "w":  noStartDate && (weekday || !!(dateString.match(/w($| |,|e)/i))),
-        "t":  noStartDate && (weekday || !!(dateString.match(/\bt($| |,|u)/i))),
-        "m":  noStartDate && (weekday || !!(dateString.match(/m($| |,|o)/i)))
+        "su": noStartDate && (everyday || weekend || !!(dateString.match(/s($| |,|u)/i))),
+        "s":  noStartDate && (everyday || weekend || !!(dateString.match(/sa($| |,|t)/i))),
+        "f":  noStartDate && (everyday || weekday || !!(dateString.match(/f($| |,|r)/i))),
+        "th": noStartDate && (everyday || weekday || !!(dateString.match(/th($| |,|u)/i))),
+        "w":  noStartDate && (everyday || weekday || (!!(dateString.match(/w($| |,|e)/i)) && !weekend)), // Otherwise also matches weekend
+        "t":  noStartDate && (everyday || weekday || !!(dateString.match(/\bt($| |,|u)/i))),
+        "m":  noStartDate && (everyday || weekday || !!(dateString.match(/m($| |,|o)/i)))
       };
   }
   return {type: type, repeat: repeat};

@@ -541,9 +541,17 @@ describe('todoist-habitrpg', function (done) {
       expect(actual.repeat, 'Sa').to.deep.equal({su: false, m: false, t: false, w: false, th: false, f: false, s: true});
     });
 
-    it('should parse weekday tasks as a daily that repeats M-F')
+    it('should parse weekday tasks as a daily that repeats M-F', function() {
+      var actual = sync.parseTodoistRepeatingDate('every weekday');
+      expect(actual.type, 'Weekday').to.equal('daily');
+      expect(actual.repeat, 'Weekday').to.deep.equal({su: false, m: true, t: true, w: true, th: true, f: true, s: false});
+    })
 
-    it('should parse weekened tasks as a daily that repeats Sat and Sun')
+    it('should parse weekened tasks as a daily that repeats Sat and Sun', function() {
+      var actual = sync.parseTodoistRepeatingDate('every weekend');
+      expect(actual.type, 'Weekend').to.equal('daily');
+      expect(actual.repeat, 'Weekend').to.deep.equal({su: true, m: false, t: false, w: false, th: false, f: false, s: true});
+    })
 
     it('should parse tasks that repeat multiple days a week')
   })
