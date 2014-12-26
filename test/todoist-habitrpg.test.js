@@ -163,13 +163,13 @@ describe('todoist-habitrpg', function (done) {
       "uid": 1539048
     }};
 
-  var sync = undefined;
-  var readHistoryFromFileStub = undefined;
-  var writeFileSyncStub = undefined;
-  var getTodoistSyncStub = undefined;
-  var syncItemsToHabitRpgSpy = undefined;
-  var habitapiStub = undefined;
-  var requestStub = undefined
+  var sync,
+      readHistoryFromFileStub,
+      writeFileSyncStub,
+      getTodoistSyncStub,
+      syncItemsToHabitRpgSpy,
+      habitapiStub,
+      requestStub;
   var taskGenerator = function(todoistItem) {
     return {
       text: todoistItem.content,
@@ -178,8 +178,8 @@ describe('todoist-habitrpg', function (done) {
       type: 'todo',
       completed: todoistItem.checked == true,
       repeat: undefined
-    }
-  }
+    };
+  };
 
   before(function() {
     sync = new thrpg(fakeOptions);
@@ -213,7 +213,7 @@ describe('todoist-habitrpg', function (done) {
     getTodoistSyncStub.restore();
     syncItemsToHabitRpgSpy.restore();
     // habitapiStub.restore();
-  })
+  });
 
   it('should require certain options for instantiation', function() {
     expect(thrpg).to.throw(/Options are required/);
@@ -232,10 +232,10 @@ describe('todoist-habitrpg', function (done) {
     getTodoistSyncStub.callsArgWith(0, null, {body: todoistResponse});
 
     sync.run(function() {
-      expect(syncItemsToHabitRpgSpy).to.have.been.calledWith([{todoist: todoistResponse.Items[0]}])
-      expect(habitapiStub.updateTask).to.not.have.been.called
-      expect(habitapiStub.createTask).to.have.have.been.calledWith(taskGenerator(todoistResponse.Items[0]))
-      expect(writeFileSyncStub).to.have.been.called
+      expect(syncItemsToHabitRpgSpy).to.have.been.calledWith([{todoist: todoistResponse.Items[0]}]);
+      expect(habitapiStub.updateTask).to.not.have.been.called;
+      expect(habitapiStub.createTask).to.have.have.been.calledWith(taskGenerator(todoistResponse.Items[0]));
+      expect(writeFileSyncStub).to.have.been.called;
       done();
     });
   });
@@ -253,9 +253,9 @@ describe('todoist-habitrpg', function (done) {
     getTodoistSyncStub.callsArgWith(0, null, {body: todoistResponse});
 
     sync.run(function() {
-      expect(syncItemsToHabitRpgSpy).to.have.been.calledWith([])
-      expect(habitapiStub.updateTask).to.not.have.been.called
-      expect(writeFileSyncStub).to.have.been.called
+      expect(syncItemsToHabitRpgSpy).to.have.been.calledWith([]);
+      expect(habitapiStub.updateTask).to.not.have.been.called;
+      expect(writeFileSyncStub).to.have.been.called;
       done();
     });
   });
@@ -283,8 +283,8 @@ describe('todoist-habitrpg', function (done) {
   });
 
   it('should update tasks that have changed their checked state', function(done) {
-    var modifiedTodoistResp = _.cloneDeep(todoistResponse)
-    modifiedTodoistResp.Items[0].checked = true
+    var modifiedTodoistResp = _.cloneDeep(todoistResponse);
+    modifiedTodoistResp.Items[0].checked = true;
     readHistoryFromFileStub.returns({
       seqNo: todoistResponse.seq_no,
       tasks: {
@@ -297,16 +297,16 @@ describe('todoist-habitrpg', function (done) {
     getTodoistSyncStub.callsArgWith(0, null, {body: modifiedTodoistResp});
     sync.run(function() {
       expect(syncItemsToHabitRpgSpy).to.have.been.calledWith([{habitrpg: {id: "44444444", completed: false}, todoist: modifiedTodoistResp.Items[0]}]);
-      expect(habitapiStub.updateTaskScore).to.have.been.calledWithMatch("44444444", true)
-      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444444", taskGenerator(modifiedTodoistResp.Items[0]))
+      expect(habitapiStub.updateTaskScore).to.have.been.calledWithMatch("44444444", true);
+      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444444", taskGenerator(modifiedTodoistResp.Items[0]));
       expect(writeFileSyncStub).to.have.been.called;
       done();
     });
   });
 
   it('should update tasks that have been completed before being synced', function(done) {
-    var modifiedTodoistResp = _.cloneDeep(todoistResponse)
-    modifiedTodoistResp.Items[0].checked = true
+    var modifiedTodoistResp = _.cloneDeep(todoistResponse);
+    modifiedTodoistResp.Items[0].checked = true;
     readHistoryFromFileStub.returns({
       seqNo: todoistResponse.seq_no,
       tasks: {
@@ -319,16 +319,16 @@ describe('todoist-habitrpg', function (done) {
     getTodoistSyncStub.callsArgWith(0, null, {body: modifiedTodoistResp});
     sync.run(function() {
       expect(syncItemsToHabitRpgSpy).to.have.been.calledWith([{habitrpg: {id: "44444444"}, todoist: modifiedTodoistResp.Items[0]}]);
-      expect(habitapiStub.updateTaskScore).to.have.been.calledWithMatch("44444444", true)
-      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444444", taskGenerator(modifiedTodoistResp.Items[0]))
+      expect(habitapiStub.updateTaskScore).to.have.been.calledWithMatch("44444444", true);
+      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444444", taskGenerator(modifiedTodoistResp.Items[0]));
       expect(writeFileSyncStub).to.have.been.called;
       done();
     });
   });
 
   it('should update tasks that have changed due dates', function(done) {
-    var modifiedTodoistResp = _.cloneDeep(todoistResponse)
-    modifiedTodoistResp.Items[0].due_date_utc = "Sat 06 Sep 2014 05:59:59 +0000"
+    var modifiedTodoistResp = _.cloneDeep(todoistResponse);
+    modifiedTodoistResp.Items[0].due_date_utc = "Sat 06 Sep 2014 05:59:59 +0000";
     readHistoryFromFileStub.returns({
       seqNo: todoistResponse.seq_no,
       tasks: {
@@ -342,8 +342,8 @@ describe('todoist-habitrpg', function (done) {
 
     sync.run(function() {
       expect(syncItemsToHabitRpgSpy).to.have.been.calledWith([{habitrpg: {id: "44444444"}, todoist: modifiedTodoistResp.Items[0]}]);
-      expect(habitapiStub.updateTask).to.have.been.called
-      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444444", taskGenerator(modifiedTodoistResp.Items[0]))
+      expect(habitapiStub.updateTask).to.have.been.called;
+      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444444", taskGenerator(modifiedTodoistResp.Items[0]));
       expect(writeFileSyncStub).to.have.been.called;
       done();
     });
@@ -364,8 +364,8 @@ describe('todoist-habitrpg', function (done) {
     getTodoistSyncStub.callsArgWith(0, null, {body: modifiedTodoistResp});
 
     sync.run(function() {
-      expect(habitapiStub.updateTask).to.have.been.called
-      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444445", taskGenerator(modifiedTodoistResp.Items[0]))
+      expect(habitapiStub.updateTask).to.have.been.called;
+      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444445", taskGenerator(modifiedTodoistResp.Items[0]));
       expect(writeFileSyncStub).to.have.been.called;
       done();
     });
@@ -388,8 +388,8 @@ describe('todoist-habitrpg', function (done) {
     getTodoistSyncStub.callsArgWith(0, null, {body: modifiedTodoistResp});
 
     sync.run(function() {
-      expect(habitapiStub.updateTask).to.have.been.called
-      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444445", taskGenerator(modifiedTodoistResp.Items[0]))
+      expect(habitapiStub.updateTask).to.have.been.called;
+      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444445", taskGenerator(modifiedTodoistResp.Items[0]));
       expect(writeFileSyncStub).to.have.been.called;
       done();
     });
@@ -398,8 +398,8 @@ describe('todoist-habitrpg', function (done) {
   it('should save an updated history to file')
 
   it('should delete the task on habitrpg when it is deleted from todolist', function(done) {
-    var modifiedTodoistResp = _.cloneDeep(todoistResponse)
-    modifiedTodoistResp.Items[0].is_deleted = true
+    var modifiedTodoistResp = _.cloneDeep(todoistResponse);
+    modifiedTodoistResp.Items[0].is_deleted = true;
     readHistoryFromFileStub.returns({
       seqNo: todoistResponse.seq_no,
       tasks: {
@@ -412,18 +412,18 @@ describe('todoist-habitrpg', function (done) {
     getTodoistSyncStub.callsArgWith(0, null, {body: modifiedTodoistResp});
 
     sync.run(function() {
-      expect(habitapiStub.deleteTask).to.have.been.called
-      expect(habitapiStub.updateTask).to.have.not.been.called
-      expect(habitapiStub.createTask).to.have.not.been.called
-      expect(habitapiStub.deleteTask).to.have.been.calledWithMatch(44444445)
+      expect(habitapiStub.deleteTask).to.have.been.called;
+      expect(habitapiStub.updateTask).to.have.not.been.called;
+      expect(habitapiStub.createTask).to.have.not.been.called;
+      expect(habitapiStub.deleteTask).to.have.been.calledWithMatch(44444445);
       expect(writeFileSyncStub).to.have.been.called;
       done();
     });
   });
 
   it('should not try to delete a task on habitrpg that wasn\'t synced yet', function(done) {
-    var modifiedTodoistResp = _.cloneDeep(todoistResponse)
-    modifiedTodoistResp.Items[0].is_deleted = true
+    var modifiedTodoistResp = _.cloneDeep(todoistResponse);
+    modifiedTodoistResp.Items[0].is_deleted = true;
     readHistoryFromFileStub.returns({
       seqNo: todoistResponse.seq_no,
       tasks: {
@@ -432,9 +432,9 @@ describe('todoist-habitrpg', function (done) {
     getTodoistSyncStub.callsArgWith(0, null, {body: modifiedTodoistResp});
 
     sync.run(function() {
-      expect(habitapiStub.deleteTask).to.have.not.been.called
-      expect(habitapiStub.updateTask).to.have.not.been.called
-      expect(habitapiStub.createTask).to.have.not.been.called
+      expect(habitapiStub.deleteTask).to.have.not.been.called;
+      expect(habitapiStub.updateTask).to.have.not.been.called;
+      expect(habitapiStub.createTask).to.have.not.been.called;
       expect(writeFileSyncStub).to.have.been.called;
       done();
     });
@@ -459,8 +459,8 @@ describe('todoist-habitrpg', function (done) {
       expect(attributes.per).to.contain(todoistLabelResponse.other.id);
       expect(attributes.per).to.contain(todoistLabelResponse.oth.id);
       done();
-    })
-  })
+    });
+  });
 
   it('should not uncheck a daily on habitrpg just because an attribute was changed on todoist', function(done) {
     var modifiedTodoistResp = _.cloneDeep(todoistResponse);
@@ -498,7 +498,7 @@ describe('todoist-habitrpg', function (done) {
       expect(writeFileSyncStub).to.have.been.called;
       done();
     });
-  })
+  });
 
   describe('Todoist date_string parsing', function() {
     it('should parse due dates as a todo', function() {
@@ -517,7 +517,7 @@ describe('todoist-habitrpg', function (done) {
       var actual = sync.parseTodoistRepeatingDate('every day');
       expect(actual.type).to.equal('daily');
       expect(actual.repeat).to.deep.equal({su: true, m: true, t: true, w: true, th: true, f: true, s: true});
-    })
+    });
 
     it('should parse tasks that repeat one day a week', function() {
       var actual = sync.parseTodoistRepeatingDate('every sunday');
@@ -581,19 +581,19 @@ describe('todoist-habitrpg', function (done) {
       var actual = sync.parseTodoistRepeatingDate('every weekday');
       expect(actual.type, 'Weekday').to.equal('daily');
       expect(actual.repeat, 'Weekday').to.deep.equal({su: false, m: true, t: true, w: true, th: true, f: true, s: false});
-    })
+    });
 
     it('should parse weekened tasks as a daily that repeats Sat and Sun', function() {
       var actual = sync.parseTodoistRepeatingDate('every weekend');
       expect(actual.type, 'Weekend').to.equal('daily');
       expect(actual.repeat, 'Weekend').to.deep.equal({su: true, m: false, t: false, w: false, th: false, f: false, s: true});
-    })
+    });
 
     it('should parse tasks that repeat multiple days a week', function() {
       var actual = sync.parseTodoistRepeatingDate('every mon,weds,fri');
       expect(actual.type, 'Mon,Weds,Fri').to.equal('daily');
       expect(actual.repeat, 'Mon,Weds,Fri').to.deep.equal({su: false, m: true, t: false, w: true, th: false, f: true, s: false});
-    })
+    });
 
     it('should correctly parse the examples Todoist gives', function() {
       var actual = sync.parseTodoistRepeatingDate('today');
@@ -666,6 +666,6 @@ describe('todoist-habitrpg', function (done) {
       actual = sync.parseTodoistRepeatingDate('every 2nd monday');
       expect(actual.type, 'every 2nd monday').to.equal('todo');
       expect(actual.repeat, 'every 2nd monday').to.undefined;
-    })
-  })
+    });
+  });
 });
