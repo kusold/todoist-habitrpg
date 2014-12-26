@@ -185,6 +185,8 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
               var direction = true;
               task.completed = true;
               habit.updateTaskScore(item.habitrpg.id, direction, function(response, error){ });
+            } else if(item.habitrpg.completed) {
+              task.completed = true;
             }
           }
           habit.updateTask(item.habitrpg.id, task, function(err, res) {
