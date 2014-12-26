@@ -261,8 +261,8 @@ describe('todoist-habitrpg', function (done) {
   });
 
   it('should update tasks that have changed content', function(done) {
-    var modifiedTodoistResp = _.cloneDeep(todoistResponse)
-    modifiedTodoistResp.Items[0].content = "Getting there"
+    var modifiedTodoistResp = _.cloneDeep(todoistResponse);
+    modifiedTodoistResp.Items[0].content = "Getting there";
     readHistoryFromFileStub.returns({
       seqNo: todoistResponse.seq_no,
       tasks: {
@@ -276,7 +276,7 @@ describe('todoist-habitrpg', function (done) {
 
     sync.run(function() {
       expect(syncItemsToHabitRpgSpy).to.have.been.calledWith([{habitrpg: {id: "44444444"}, todoist: modifiedTodoistResp.Items[0]}]);
-      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444444", taskGenerator(modifiedTodoistResp.Items[0]))
+      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444444", taskGenerator(modifiedTodoistResp.Items[0]));
       expect(writeFileSyncStub).to.have.been.called;
       done();
     });
@@ -460,6 +460,44 @@ describe('todoist-habitrpg', function (done) {
       expect(attributes.per).to.contain(todoistLabelResponse.oth.id);
       done();
     })
+  })
+
+  it('should not uncheck a daily on habitrpg just because an attribute was changed on todoist', function(done) {
+    var modifiedTodoistResp = _.cloneDeep(todoistResponse);
+    modifiedTodoistResp.Items[0].content = "Getting there";
+    modifiedTodoistResp.Items[0].date_string = "every day";
+    modifiedTodoistResp.Items[0].checked = false;
+    var dueDate = new Date().toString();
+    modifiedTodoistResp.Items[0].due_date_utc = dueDate;
+
+    var historicalTask = {
+      id: "44444444",
+      completed: true,
+      date: dueDate
+    };
+
+    readHistoryFromFileStub.returns({
+      seqNo: todoistResponse.seq_no,
+      tasks: {
+        44444444: {
+          habitrpg: historicalTask,
+          todoist: todoistResponse.Items[0]
+        }
+      }
+    });
+    getTodoistSyncStub.callsArgWith(0, null, {body: modifiedTodoistResp});
+
+    var expectedTask = taskGenerator(modifiedTodoistResp.Items[0]);
+    expectedTask.type = "daily";
+    expectedTask.repeat = { f: true, m: true, s: true, su: true, t: true, th: true, w: true };
+    expectedTask.completed = true;
+
+    sync.run(function() {
+      expect(syncItemsToHabitRpgSpy).to.have.been.calledWith([{habitrpg: historicalTask, todoist: modifiedTodoistResp.Items[0]}]);
+      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444444", expectedTask);
+      expect(writeFileSyncStub).to.have.been.called;
+      done();
+    });
   })
 
   describe('Todoist date_string parsing', function() {
