@@ -57,7 +57,7 @@ Periodically new versions will be published. You can install these updates with 
 ## Command Line Help
 `todoist-habitrpg --help`
 
-## Cron Usage - Linux Only
+## Cron Usage - Linux/Mac Only
 I would recommend setting this up as a cron job for automatic syncing.
 
 1. `crontab -e`
