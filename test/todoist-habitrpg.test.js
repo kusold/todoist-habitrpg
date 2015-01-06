@@ -326,6 +326,30 @@ describe('todoist-habitrpg', function (done) {
     });
   });
 
+  it('should process tasks without a date string', function(done) {
+    var modifiedTodoistResp = _.cloneDeep(todoistResponse);
+    modifiedTodoistResp.Items[0].due_date_utc = "Sat 06 Sep 2014 05:59:59 +0000";
+    modifiedTodoistResp.Items[0].date_string = undefined;
+    readHistoryFromFileStub.returns({
+      seqNo: todoistResponse.seq_no,
+      tasks: {
+        44444444: {
+          habitrpg: {id: "44444444"},
+          todoist: todoistResponse.Items[0]
+        }
+      }
+    });
+    getTodoistSyncStub.callsArgWith(0, null, {body: modifiedTodoistResp});
+
+    sync.run(function() {
+      expect(syncItemsToHabitRpgSpy).to.have.been.calledWith([{habitrpg: {id: "44444444"}, todoist: modifiedTodoistResp.Items[0]}]);
+      expect(habitapiStub.updateTask).to.have.been.called;
+      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444444", taskGenerator(modifiedTodoistResp.Items[0]));
+      expect(writeFileSyncStub).to.have.been.called;
+      done();
+    });
+  });
+
   it('should update tasks that have changed due dates', function(done) {
     var modifiedTodoistResp = _.cloneDeep(todoistResponse);
     modifiedTodoistResp.Items[0].due_date_utc = "Sat 06 Sep 2014 05:59:59 +0000";
