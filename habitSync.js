@@ -289,6 +289,8 @@ habitSync.prototype.parseTodoistRepeatingDate = function(dateString) {
   var type = "todo";
   var repeat;
 
+  if(!dateString) return {type: type, repeat: repeat};
+
   var noStartDate = !(dateString.match(/(after|starting|last|\d+(st|nd|rd|th)|(first|second|third))/i));
 
   if(dateString.match(/^ev(ery)? [^\d]/i) && noStartDate) {
