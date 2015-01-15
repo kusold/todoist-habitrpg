@@ -200,6 +200,9 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
             cb(err, res);
           });
         } else {
+          if(task.completed) {
+            task.dateCompleted = new Date();
+          }
           habit.createTask(task, function(err, res) {
             cb(err, res);
           });
