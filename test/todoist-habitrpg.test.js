@@ -299,6 +299,33 @@ describe('todoist-habitrpg', function (done) {
       expect(syncItemsToHabitRpgSpy).to.have.been.calledWith([{habitrpg: {id: "44444444", completed: false}, todoist: modifiedTodoistResp.Items[0]}]);
       expect(habitapiStub.updateTaskScore).to.have.been.calledWithMatch("44444444", true);
       expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444444", taskGenerator(modifiedTodoistResp.Items[0]));
+      expect(habitapiStub.updateTask.lastCall.args[1].dateCompleted).to.exist;
+      expect(writeFileSyncStub).to.have.been.called;
+      done();
+    });
+  });
+
+  it('should remove dateCompleted form todos that have unchecked their state', function(done) {
+    var modifiedTodoistResp = _.cloneDeep(todoistResponse);
+    modifiedTodoistResp.Items[0].checked = false;
+
+    var historyTodoistResp = _.cloneDeep(todoistResponse).Items[0];
+    historyTodoistResp.checked = true;
+    readHistoryFromFileStub.returns({
+      seqNo: todoistResponse.seq_no,
+      tasks: {
+        44444444: {
+          habitrpg: {id: "44444444", completed: true},
+          todoist: historyTodoistResp
+        }
+      }
+    });
+    getTodoistSyncStub.callsArgWith(0, null, {body: modifiedTodoistResp});
+    sync.run(function() {
+      expect(syncItemsToHabitRpgSpy).to.have.been.calledWith([{habitrpg: {id: "44444444", completed: true}, todoist: modifiedTodoistResp.Items[0]}]);
+      expect(habitapiStub.updateTaskScore).to.have.been.calledWithMatch("44444444", true);
+      expect(habitapiStub.updateTask).to.have.been.calledWithMatch("44444444", taskGenerator(modifiedTodoistResp.Items[0]));
+      expect(habitapiStub.updateTask.lastCall.args[1].dateCompleted).to.be.empty;
       expect(writeFileSyncStub).to.have.been.called;
       done();
     });
