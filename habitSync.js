@@ -200,7 +200,7 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
             cb(err, res);
           });
         } else {
-          if(task.completed) {
+          if(task.type == "todo" && task.completed) {
             task.dateCompleted = new Date();
           }
           habit.createTask(task, function(err, res) {
