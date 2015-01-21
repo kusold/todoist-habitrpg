@@ -175,6 +175,13 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
               (task.completed === true && item.habitrpg.completed === undefined)) {
               var direction = task.completed === true;
               habit.updateTaskScore(item.habitrpg.id, direction, function(response, error){ });
+
+              // Need to set dateCompleted on todo's that are checked
+              if(direction) {
+                task.dateCompleted = new Date();
+              } else if (!direction) {
+                task.dateCompleted = "";
+              }
             }
           } else if(task.type == "daily") {
 
@@ -193,6 +200,9 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
             cb(err, res);
           });
         } else {
+          if(task.type == "todo" && task.completed) {
+            task.dateCompleted = new Date();
+          }
           habit.createTask(task, function(err, res) {
             cb(err, res);
           });
