@@ -1,6 +1,6 @@
 {
   "name": "todoist-habitrpg",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "One way sync from Todoist -> HabitRPG.",
   "main": "index.js",
   "homepage": "https://github.com/Kusold/todoist-habitrpg",
