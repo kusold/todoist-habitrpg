@@ -371,6 +371,29 @@ describe('todoist-habitrpg', function (done) {
     });
   });
 
+  it('should recreate a task if it has habitrpg history, but not habitrpg id', function(done) {
+    var modifiedTodoistResp = _.cloneDeep(todoistResponse);
+    modifiedTodoistResp.Items[0].content = "Getting there";
+    readHistoryFromFileStub.returns({
+      seqNo: todoistResponse.seq_no,
+      tasks: {
+        44444444: {
+          habitrpg: {attribute: 'str'},
+          todoist: todoistResponse.Items[0]
+        }
+      }
+    });
+    getTodoistSyncStub.callsArgWith(0, null, {body: modifiedTodoistResp});
+
+    sync.run(function() {
+      expect(syncItemsToHabitRpgSpy).to.have.been.calledWith([{habitrpg: {attribute: 'str'}, todoist: modifiedTodoistResp.Items[0]}]);
+      expect(habitapiStub.updateTask).to.not.have.been.called;
+      expect(habitapiStub.createTask).to.have.been.called;
+      expect(writeFileSyncStub).to.have.been.called;
+      done();
+    });
+  });
+
   it('should process tasks without a date string', function(done) {
     var modifiedTodoistResp = _.cloneDeep(todoistResponse);
     modifiedTodoistResp.Items[0].due_date_utc = "Sat 06 Sep 2014 05:59:59 +0000";
