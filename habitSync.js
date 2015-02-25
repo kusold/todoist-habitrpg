@@ -235,6 +235,10 @@ habitSync.prototype.getHabitAttributeIds = function(callback) {
   request.post('https://api.todoist.com/API/getLabels')
 	 .send('token=' + self.todoist)
    .end(function(err, res) {
+     if(err) {
+       console.error(err);
+       return callback(err, null);
+     }
      var labelObject = res.body;
      for(var l in labelObject) {
       labels[l] = labelObject[l].id;
