@@ -14,30 +14,7 @@ var history = {};
 // options.historyPath: Directory for history
 //
 function habitSync(options) {
-  if(!options) {
-    throw new Error("Options are required");
-  }
-  if(!options.uid) {
-    throw new Error("No HabitRPG User Id found");
-  }
-  if (!options.token) {
-    throw new Error("No HabitRPG API Token found");
-  }
-  if (!options.todoist) {
-    throw new Error("No Todoist API Token found");
-  }
-
-  if (options.historyPath) {
-    this.historyPath = options.historyPath + '/.todoist-habitrpg.json';
-  } else {
-    // Defaults
-    if(process.platform == "win32") {
-      this.historyPath = process.env.HOMEPATH + '/.todoist-habitrpg.json'
-    } else {
-      this.historyPath = process.env.HOME + '/.todoist-habitrpg.json'
-    }
-  }
-
+  this.historyPath = options.historyPath + '/.todoist-habitrpg.json';
   this.uid = options.uid;
   this.token = options.token;
   this.todoist = options.todoist;
