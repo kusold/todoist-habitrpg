@@ -61,8 +61,8 @@ habitSync.prototype.run = function(done) {
       self.getTodoistSync(cb);
     },
     function(res, cb) {
-      history.seqNo = res.body.seq_no;
-      self.updateHistoryForTodoistItems(res.body.Items);
+      history.sync_token = res.body.sync_token;
+      self.updateHistoryForTodoistItems(res.body.items);
       var changedTasks = self.findTasksThatNeedUpdating(history, oldHistory);
       self.syncItemsToHabitRpg(changedTasks, cb);
     }
@@ -97,7 +97,7 @@ habitSync.prototype.findTasksThatNeedUpdating = function(newHistory, oldHistory)
 
 habitSync.prototype.updateHistoryForTodoistItems = function(items) {
   var self = this;
-  var habit = new habitapi(self.uid, self.token);
+  var habit = new habitapi(self.uid, self.token, null, 'v2');
   _.forEach(items, function(item) {
     if(history.tasks[item.id]) {
       if(item.is_deleted) {
@@ -128,19 +128,20 @@ habitSync.prototype.readHistoryFromFile = function(path) {
 
 habitSync.prototype.getTodoistSync = function(cb) {
   var self = this;
-  var seqNo = history.seqNo || 0;
+  var sync_token = history.sync_token || 0;
 
-  request.post('https://api.todoist.com/TodoistSync/v5.3/get')
-   .send('api_token=' + self.todoist)
-   .send('seq_no='+seqNo)
+  request.get('https://todoist.com/API/v7/sync')
+   .send('token=' + self.todoist)
+   .send('sync_token=' + sync_token)
+   .send('resource_types=["all"]')
    .end(function(err, res) {
      cb(err,res);
    });
 };
 
 habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
-  var self = this;
-  var habit = new habitapi(self.uid, self.token);
+  var self = this
+  var habit = new habitapi(self.uid, self.token, null, 'v2');
   // Cannot execute in parallel. See: https://github.com/HabitRPG/habitrpg/issues/2301
   async.eachSeries(items, function(item, next) {
     async.waterfall([
