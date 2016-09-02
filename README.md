@@ -65,6 +65,8 @@ I would recommend setting this up as a cron job for automatic syncing.
 2. `*/10 * * * * todoist-habitrpg -u habitRpgUserId -t habitRpgApiToken -a todoistApiToken`
 3. Verify it was saved with `crontab -l`
 
+Troubleshooting: If this doesn't work for you, please use absolute paths or adjust the PATH for your cron.
+
 ## Current Limitations
 * Only supports syncing from Todoist -> HabitRPG.
 * Only supports basic task syncing. Subtasks get synced as a toplevel task in HabitRPG
