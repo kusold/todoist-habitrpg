@@ -310,7 +310,7 @@ habitSync.prototype.parseTodoistRepeatingDate = function(dateString) {
   if(dateString.match(/^ev(ery)? [^\d]/i) && noStartDate) {
       type = 'daily';
 
-      var everyday = !!(dateString.match(/^ev(ery)? [^(week)]?day/i));
+      var everyday = !!(dateString.match(/^ev(ery)? [^(week)]?(?:day|night)/i));
       var weekday = !!(dateString.match(/^ev(ery)? (week)?day/i));
       var weekend = !!(dateString.match(/^ev(ery)? (week)?end/i));
 
