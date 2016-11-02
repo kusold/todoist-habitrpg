@@ -605,6 +605,12 @@ describe('todoist-habitrpg', function (done) {
       expect(actual.repeat).to.be.undefined;
     });
 
+    it('should parse todos with "daily" date as a daily', function() {
+      var actual = sync.parseTodoistRepeatingDate('daily');
+      expect(actual.type).to.equal('daily');
+      expect(actual.repeat).to.deep.equal({su: true, m: true, t: true, w: true, th: true, f: true, s: true});
+    });
+
     it('should parse todos with "every day" date as a daily', function() {
       var actual = sync.parseTodoistRepeatingDate('every day');
       expect(actual.type).to.equal('daily');
