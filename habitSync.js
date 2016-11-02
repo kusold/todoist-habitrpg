@@ -215,8 +215,11 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
           habitrpg: res.body
         };
         // Adds date to habitrpg record if type is daily
-        if(res.body.type == "daily") {
+        if(res.body && res.body.type == "daily") {
           history.tasks[item.todoist.id].habitrpg.date = new Date(item.todoist.due_date_utc);
+        } else if (!res.body) {
+          // TODO: Remove this once GH issue #44 actually gets fixed.
+          console.error('ERROR: Body is undefined. Please file an issue with this. res:' + JSON.stringify(res))
         }
         cb();
       }
@@ -234,8 +237,8 @@ habitSync.prototype.getHabitAttributeIds = function(callback) {
   var labels = {};
 
   request.post('https://api.todoist.com/API/getLabels')
-	 .send('token=' + self.todoist)
-   .end(function(err, res) {
+    .send('token=' + self.todoist)
+    .end(function(err, res) {
      var labelObject = res.body;
      for(var l in labelObject) {
       labels[l] = labelObject[l].id;
