@@ -4,6 +4,7 @@ var request = require('superagent');
 var async = require('async');
 var fs = require('fs');
 var _ = require('lodash');
+var util = require('util');
 
 var history = {};
 
@@ -219,7 +220,7 @@ habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
           history.tasks[item.todoist.id].habitrpg.date = new Date(item.todoist.due_date_utc);
         } else if (!res.body) {
           // TODO: Remove this once GH issue #44 actually gets fixed.
-          console.error('ERROR: Body is undefined. Please file an issue with this. res:' + JSON.stringify(res))
+          console.error('ERROR: Body is undefined. Please file an issue with this. res:' + util.inspect(res));
         }
         cb();
       }
