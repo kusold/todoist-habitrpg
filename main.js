@@ -28,15 +28,15 @@ function main() {
     return;
   }
   if (program.file) {
-    program.historyPath = program.file + '/.todoist-habitrpg.json';
+    program.historyPath = program.file;
   } else {
     if(process.platform == "win32") {
-      program.historyPath = process.env.HOMEPATH + '/.todoist-habitrpg.json'
+      program.historyPath = process.env.HOMEPATH;
     } else {
-      program.historyPath = process.env.HOME + '/.todoist-habitrpg.json'
+      program.historyPath = process.env.HOME;
     }
   }
-  
+
   var sync = new habitSync({uid: program.uid, token: program.token, todoist: program.todoist, historyPath: program.file});
   sync.run(function(err) {
     if(err) {
