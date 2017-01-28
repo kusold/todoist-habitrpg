@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+'use strict';
 const _ = require('lodash');
 const fetch = require('isomorphic-fetch');
 const Habitica = require('habitica');
