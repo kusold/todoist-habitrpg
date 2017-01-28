@@ -10,10 +10,10 @@ const fs = require('fs');
 class HabitSync {
   constructor({uid, token, todoist, historyPath} = {}) {
     if(!uid) {
-      throw new Error("No HabitRPG User Id found");
+      throw new Error('No Habitica User Id found');
     }
     if (!token) {
-      throw new Error("No HabitRPG API Token found");
+      throw new Error("No Habitica API Token found");
     }
     if (!todoist) {
       throw new Error("No Todoist API Token found");
@@ -68,7 +68,6 @@ class HabitSync {
         );
 
         const tasks = needsUpdating.map(item => this.prepareTask(item));
-        console.log(tasks)
 
         let index = 0;
         const promiseReducer = () => {
@@ -135,7 +134,7 @@ class HabitSync {
       completed: task.checked == true,
       type,
       repeat,
-    }
+    };
     //TODO: Check attributes
   }
 

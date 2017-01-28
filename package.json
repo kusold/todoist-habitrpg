@@ -40,7 +40,7 @@
     "todoist-habitrpg": "./main.js"
   },
   "engines": {
-    "node": ">=0.10"
+    "node": ">=4"
   },
   "os": [
     "darwin",
@@ -56,10 +56,10 @@
     "lodash": "4.17.4"
   },
   "devDependencies": {
-    "chai": "3.5.0",
-    "mocha": "3.1.2",
-    "sinon": "^1.10.3",
-    "sinon-chai": "^2.5.0"
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "sinon": "^1.17.7",
+    "sinon-chai": "^2.8.0"
   },
   "preferGlobal": true
 }
