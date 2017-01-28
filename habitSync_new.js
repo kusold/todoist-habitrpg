@@ -9,7 +9,15 @@ const querystring = require('querystring');
 const fs = require('fs');
 
 class HabitSync {
-  constructor({uid, token, todoist, historyPath} = {}) {
+  // Node 4 Support
+  // constructor({uid, token, todoist, historyPath} = {}) {
+  constructor(options) {
+    options = options || {};
+    const uid = options.uid;
+    const token = options.token;
+    const todoist = options.todoist;
+    const historyPath = options.historyPath;
+
     if(!uid) {
       throw new Error('No Habitica User Id found');
     }
@@ -125,7 +133,12 @@ class HabitSync {
   }
 
   prepareTask(task) {
-    const { repeat, type } = this.parseTodoistRepeatingDate(task.date_string);
+    // Node 4 Support
+    //const { repeat, type } = this.parseTodoistRepeatingDate(task.date_string);
+    const repeatType = this.parseTodoistRepeatingDate(task.date_string);
+    const repeat = repeatType.repeat;
+    const type = repeatType.type;
+
     let preparedTask =  {
       id: task.id, //TODOIST ID
       is_deleted: task.is_deleted, // Determine if this task should be deleted
