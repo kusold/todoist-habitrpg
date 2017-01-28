@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+'use strict';
 var habitapi = require('habitrpg-api');
 var request = require('superagent');
 var async = require('async');
