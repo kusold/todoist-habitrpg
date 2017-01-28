@@ -1008,5 +1008,26 @@ describe('todoist-habitrpg', () => {
         return Promise.resolve();
       });
     });
-  })
+  });
+  context('syncTodoist', () => {
+    it('syncTodoist Placeholder')
+  });
+
+  context('taskNeedsUpdating', () => {
+    const tests = [
+      {name: 'is new task', newTask: {id: 1}, oldTask: undefined, expected: true},
+      {name: 'has changed labels', newTask: {labels: 'alice'}, oldTask: {labels: 'bob'}, expected: true},
+      {name: 'has changed content', newTask: {content: 'alice'}, oldTask: {content: 'bob'}, expected: true},
+      {name: 'has changed checked', newTask: {checked: true}, oldTask: {checked: false}, expected: true},
+      {name: 'has changed checked', newTask: {checked: true}, oldTask: {checked: false}, expected: true},
+      {name: 'has changed is_deleted', newTask: {is_deleted: new Date()}, oldTask: {is_deleted: new Date('1/1/1970')}, expected: true},
+      {name: 'are the same', newTask: {content: 'Hello'}, oldTask: {content: 'Hello'}, expected: false},
+    ];
+
+    tests.map((test) =>
+      it(test.name, () =>
+        expect(sync.taskNeedsUpdating(test.newTask, test.oldTask)).to.equal(test.expected)
+      )
+    );
+  });
 });
