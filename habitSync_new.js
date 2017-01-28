@@ -126,16 +126,18 @@ class HabitSync {
 
   prepareTask(task) {
     const { repeat, type } = this.parseTodoistRepeatingDate(task.date_string);
-    return {
+    let preparedTask =  {
       id: task.id, //TODOIST ID
       is_deleted: task.is_deleted, // Determine if this task should be deleted
       text: task.content,
       dateCreated: new Date(task.date_added),
-      date: task.due_date_utc ?  new Date(task.due_date_utc) : undefined,
       completed: task.checked == true,
       type,
       repeat,
     };
+    if(task.due_date_utc) preparedTask.date = new Date(task.due_date_utc);
+    if(preparedTask.completed) preparedTask.dateCompleted = new Date();
+    return preparedTask;
     //TODO: Check attributes
   }
 
@@ -186,7 +188,6 @@ class HabitSync {
   scoreTodo(newItem, oldItem) {
     if(this.taskNeedsScoring(newItem, oldItem)) {
       const direction = newItem.completed === true;
-      if(direction) newItem.dateCompleted = new Date();
       return this.scoreTask(oldItem.id, direction).then(() => Promise.resolve(newItem));
     } 
     // Didn't need updating
@@ -195,10 +196,12 @@ class HabitSync {
 
   scoreDaily(newItem, oldItem) {
     if(this.taskNeedsScoring(newItem, oldItem)) {
+      if(new Date(newItem.date) >= new Date(oldItem.date)) {
+        newItem.completed = true;
+      }
       const direction = newItem.completed === true;
-      if(direction) newItem.dateCompleted = new Date();
       return this.scoreTask(oldItem.id, direction).then(() => Promise.resolve(newItem));
-    } 
+    }
     // Didn't need updating
     return Promise.resolve(newItem);
     
@@ -216,7 +219,7 @@ class HabitSync {
 
   taskNeedsScoring(newTask, oldTask) {
     const changed = newTask.completed != oldTask.completed && oldTask.completed !== undefined;
-    const newCompleted = newTask.completed === true && oldTask === undefined;
+    const newCompleted = newTask.completed === true && oldTask.completed === undefined;
 
     return changed || newCompleted;
   }
@@ -225,6 +228,7 @@ class HabitSync {
     return this.habiticaClient.post(`/tasks/user`, task)
   }
   deleteHabiticaTask(id) {
+    if(!id) return Promise.resolve(); // New task was already deleted before we could sync
     return this.habiticaClient.del(`/tasks/${id}`).catch(err => {
       if(err.status === 404) {
         return Promise.resolve();

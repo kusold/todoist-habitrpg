@@ -240,7 +240,7 @@ describe('todoist-habitrpg', function (done) {
     });
   });
 
-  xit('should send new completed Todoist tasks to HabitRPG with a dateCompleted', function() {
+  it('should send new completed Todoist tasks to HabitRPG with a dateCompleted', function() {
     var modifiedTodoistResp = _.cloneDeep(todoistResponse);
     modifiedTodoistResp.items[0].checked = true;
 
@@ -251,7 +251,6 @@ describe('todoist-habitrpg', function (done) {
       expect(habiticaStub.put).to.not.have.been.called;
       expect(habiticaStub.post).to.have.been.calledOnce;
       expect(habiticaStub.post).to.have.have.been.calledWithMatch('/tasks/user', taskGenerator(modifiedTodoistResp.items[0]));
-      console.log(habiticaStub.post.lastCall.args[1]);
       expect(habiticaStub.post.lastCall.args[1].dateCompleted).to.be.exist;
       expect(writeFileStub).to.have.been.called;
       return Promise.resolve();
@@ -353,7 +352,7 @@ describe('todoist-habitrpg', function (done) {
     });
   });
 
-  xit('should update tasks that have been completed before being synced', function() {
+  it('should update tasks that have been completed before being synced', function() {
     var modifiedTodoistResp = _.cloneDeep(todoistResponse);
     modifiedTodoistResp.items[0].checked = true;
     readFileStub.returns(JSON.stringify({
@@ -365,7 +364,7 @@ describe('todoist-habitrpg', function (done) {
         }
       }
     }));
-        syncTodoistStub.returns(Promise.resolve(modifiedTodoistResp));
+    syncTodoistStub.returns(Promise.resolve(modifiedTodoistResp));
     return sync.run().then(() => {
       expect(habiticaStub.post).to.be.calledOnce;
       expect(habiticaStub.post).to.have.been.calledWith('/tasks/44444444/score/up');
@@ -516,7 +515,7 @@ describe('todoist-habitrpg', function (done) {
     });
   });
 
-  xit('should not try to delete a task on habitrpg that wasn\'t synced yet', function() {
+  it('should not try to delete a task on habitrpg that wasn\'t synced yet', function() {
     var modifiedTodoistResp = _.cloneDeep(todoistResponse);
     modifiedTodoistResp.items[0].is_deleted = true;
     readFileStub.returns(JSON.stringify({
@@ -557,7 +556,7 @@ describe('todoist-habitrpg', function (done) {
     });
   });
 
-  xit('should not uncheck a daily on habitrpg just because an attribute was changed on todoist', function() {
+  it('should not uncheck a daily on habitrpg just because an attribute was changed on todoist', function() {
     var modifiedTodoistResp = _.cloneDeep(todoistResponse);
     modifiedTodoistResp.items[0].content = "Getting there";
     modifiedTodoistResp.items[0].date_string = "every day";
@@ -580,7 +579,7 @@ describe('todoist-habitrpg', function (done) {
         }
       }
     }));
-        syncTodoistStub.returns(Promise.resolve(modifiedTodoistResp));
+    syncTodoistStub.returns(Promise.resolve(modifiedTodoistResp));
 
     var expectedTask = taskGenerator(modifiedTodoistResp.items[0]);
     expectedTask.type = "daily";
