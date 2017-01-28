@@ -49,11 +49,11 @@
   ],
   "license": "GPL v3",
   "dependencies": {
-    "habitrpg-api": "1.0.1",
     "commander": "~2.2.0",
-    "superagent": "~0.18.0",
-    "async": "~0.9.0",
-    "lodash": "~2.4.1"
+    "es6-promise-pool": "2.4.4",
+    "habitica": "4.0.0",
+    "isomorphic-fetch": "2.2.1",
+    "lodash": "4.17.4"
   },
   "devDependencies": {
     "chai": "3.5.0",

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var program = require('commander');
-var habitSync = require('./habitSync');
+var habitSync = require('./habitSync_new');
 
 program
   .version('0.0.1')
@@ -38,10 +38,7 @@ function main() {
   }
   
   var sync = new habitSync({uid: program.uid, token: program.token, todoist: program.todoist, historyPath: program.file});
-  sync.run(function(err) {
-    if(err) {
-      console.log('Sync failed with error: ' + err)
-    }
-    console.log('Sync completed successfully.')
-  });
+  sync.run()
+    .then(() => console.log('Sync completed successfully'))
+    .catch((err) => console.log(`Sync failed with error: ${err} \n ${err.stack}`))
 }

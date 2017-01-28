@@ -1,13 +1,11 @@
-var sinon = require('sinon');
-var sinonChai = require('sinon-chai');
-var expect = require('chai').expect;
-var path = require('path');
-var chai = require('chai');
-var fs = require('fs');
-var _ = require('lodash');
-var habitapi = require('habitrpg-api');
-var thrpg = require('../habitSync.js');
-var request = require('superagent');
+const sinon = require('sinon');
+const sinonChai = require('sinon-chai');
+const expect = require('chai').expect;
+const path = require('path');
+const chai = require('chai');
+const fs = require('fs');
+const _ = require('lodash');
+const thrpg = require('../habitSync_new.js');
 
 chai.use(expect);
 chai.use(sinonChai);
