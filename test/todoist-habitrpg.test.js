@@ -14,161 +14,177 @@ const thrpg = require('../habitSync_new.js');
 chai.use(expect);
 chai.use(sinonChai);
 
-describe('todoist-habitrpg', () => {
-  context('sync', () => {
-    const fakeOptions = {uid: 1, token: 2, todoist: 3};
-    const todoistResponse = {
-      "sync_token": 5555555555,
-      "items": [{
-        "date_string": "",
-        "checked": 0,
-        "collapsed": 0,
-        "project_id": 111111111,
-        "responsible_uid": null,
-        "item_order": 6,
-        "priority": 1,
-        "has_notifications": 0,
-        "in_history": 0,
-        "sync_id": null,
-        "labels": [],
-        "is_archived": 0,
-        "assigned_by_uid": 2222222,
-        "day_order": -1,
-        "due_date": "Thu 04 Sep 2014 22:59:59",
-        "date_added": "Thu 21 Aug 2014 15:00:19 +0000",
-        "indent": 2,
-        "children": null,
-        "content": "Create More Tests",
-        "is_deleted": 0,
-        "user_id": 3333333,
-        "due_date_utc": "Fri 05 Sep 2014 05:59:59 +0000",
-        "id": 44444444
-      }]
-    };
-    const todoistLabelResponse = {
-      "oth": {
-        "is_deleted": 0,
-        "name": "oth",
-        "color": 7,
-        "id": 414269,
-        "uid": 1539048
-      },
-      "soc": {
-        "is_deleted": 0,
-        "name": "soc",
-        "color": 7,
-        "id": 414265,
-        "uid": 1539048
-      },
-      "perception": {
-        "is_deleted": 0,
-        "name": "perception",
-        "color": 7,
-        "id": 414267,
-        "uid": 1539048
-      },
-      "physical": {
-        "is_deleted": 0,
-        "name": "physical",
-        "color": 7,
-        "id": 414256,
-        "uid": 1539048
-      },
-      "mental": {
-        "is_deleted": 0,
-        "name": "mental",
-        "color": 7,
-        "id": 414260,
-        "uid": 1539048
-      },
-      "int": {
-        "is_deleted": 0,
-        "name": "int",
-        "color": 7,
-        "id": 414258,
-        "uid": 1539048
-      },
-      "intelligence": {
-        "is_deleted": 0,
-        "name": "intelligence",
-        "color": 7,
-        "id": 414259,
-        "uid": 1539048
-      },
-      "men": {
-        "is_deleted": 0,
-        "name": "men",
-        "color": 7,
-        "id": 414261,
-        "uid": 1539048
-      },
-      "per": {
-        "is_deleted": 0,
-        "name": "per",
-        "color": 7,
-        "id": 414266,
-        "uid": 1539048
-      },
-      "testlabel": {
-        "is_deleted": 0,
-        "name": "testLabel",
-        "color": 7,
-        "id": 414247,
-        "uid": 1539048
-      },
-      "phy": {
-        "is_deleted": 0,
-        "name": "phy",
-        "color": 7,
-        "id": 414257,
-        "uid": 1539048
-      },
-      "other": {
-        "is_deleted": 0,
-        "name": "other",
-        "color": 7,
-        "id": 414268,
-        "uid": 1539048
-      },
-      "str": {
-        "is_deleted": 0,
-        "name": "str",
-        "color": 7,
-        "id": 414253,
-        "uid": 1539048
-      },
-      "social": {
-        "is_deleted": 0,
-        "name": "social",
-        "color": 7,
-        "id": 414264,
-        "uid": 1539048
-      },
-      "con": {
-        "is_deleted": 0,
-        "name": "con",
-        "color": 7,
-        "id": 414262,
-        "uid": 1539048
-      },
-      "strength": {
-        "is_deleted": 0,
-        "name": "strength",
-        "color": 7,
-        "id": 414254,
-        "uid": 1539048
-      },
-      "constitution": {
-        "is_deleted": 0,
-        "name": "constitution",
-        "color": 7,
-        "id": 414263,
-        "uid": 1539048
-      }
-    };
+const todoistResponse = {
+  "sync_token": 5555555555,
+  "items": [{
+    "date_string": "",
+    "checked": 0,
+    "collapsed": 0,
+    "project_id": 111111111,
+    "responsible_uid": null,
+    "item_order": 6,
+    "priority": 1,
+    "has_notifications": 0,
+    "in_history": 0,
+    "sync_id": null,
+    "labels": [],
+    "is_archived": 0,
+    "assigned_by_uid": 2222222,
+    "day_order": -1,
+    "due_date": "Thu 04 Sep 2014 22:59:59",
+    "date_added": "Thu 21 Aug 2014 15:00:19 +0000",
+    "indent": 2,
+    "children": null,
+    "content": "Create More Tests",
+    "is_deleted": 0,
+    "user_id": 3333333,
+    "due_date_utc": "Fri 05 Sep 2014 05:59:59 +0000",
+    "id": 44444444
+  }]
+};
+const todoistLabelResponse = {
+  "oth": {
+    "is_deleted": 0,
+    "name": "oth",
+    "color": 7,
+    "id": 414269,
+    "uid": 1539048
+  },
+  "soc": {
+    "is_deleted": 0,
+    "name": "soc",
+    "color": 7,
+    "id": 414265,
+    "uid": 1539048
+  },
+  "perception": {
+    "is_deleted": 0,
+    "name": "perception",
+    "color": 7,
+    "id": 414267,
+    "uid": 1539048
+  },
+  "physical": {
+    "is_deleted": 0,
+    "name": "physical",
+    "color": 7,
+    "id": 414256,
+    "uid": 1539048
+  },
+  "mental": {
+    "is_deleted": 0,
+    "name": "mental",
+    "color": 7,
+    "id": 414260,
+    "uid": 1539048
+  },
+  "int": {
+    "is_deleted": 0,
+    "name": "int",
+    "color": 7,
+    "id": 414258,
+    "uid": 1539048
+  },
+  "intelligence": {
+    "is_deleted": 0,
+    "name": "intelligence",
+    "color": 7,
+    "id": 414259,
+    "uid": 1539048
+  },
+  "men": {
+    "is_deleted": 0,
+    "name": "men",
+    "color": 7,
+    "id": 414261,
+    "uid": 1539048
+  },
+  "per": {
+    "is_deleted": 0,
+    "name": "per",
+    "color": 7,
+    "id": 414266,
+    "uid": 1539048
+  },
+  "testlabel": {
+    "is_deleted": 0,
+    "name": "testLabel",
+    "color": 7,
+    "id": 414247,
+    "uid": 1539048
+  },
+  "phy": {
+    "is_deleted": 0,
+    "name": "phy",
+    "color": 7,
+    "id": 414257,
+    "uid": 1539048
+  },
+  "other": {
+    "is_deleted": 0,
+    "name": "other",
+    "color": 7,
+    "id": 414268,
+    "uid": 1539048
+  },
+  "str": {
+    "is_deleted": 0,
+    "name": "str",
+    "color": 7,
+    "id": 414253,
+    "uid": 1539048
+  },
+  "social": {
+    "is_deleted": 0,
+    "name": "social",
+    "color": 7,
+    "id": 414264,
+    "uid": 1539048
+  },
+  "con": {
+    "is_deleted": 0,
+    "name": "con",
+    "color": 7,
+    "id": 414262,
+    "uid": 1539048
+  },
+  "strength": {
+    "is_deleted": 0,
+    "name": "strength",
+    "color": 7,
+    "id": 414254,
+    "uid": 1539048
+  },
+  "constitution": {
+    "is_deleted": 0,
+    "name": "constitution",
+    "color": 7,
+    "id": 414263,
+    "uid": 1539048
+  }
+};
 
-    let sync,
-      fileExistsStub,
+describe('todoist-habitrpg', () => {
+  let sync;
+  before(() => {
+    sync = new thrpg({uid: 1, token: 2, todoist: 3});
+  });
+
+  context('constructor', () => {
+    it('should require certain options for instantiation', () => {
+      expect(() => new thrpg()).to.throw(/No Habitica User Id found/);
+      expect(() => new thrpg({uid: 1})).to.throw(/No Habitica API Token found/);
+      expect(() => new thrpg({uid: 1, token: 2})).to.throw(/No Todoist API Token found/);
+      const thrpgSync = new thrpg({uid: 1, token: 2, todoist: 3});
+      expect(thrpgSync.uid).to.equal(1);
+      expect(thrpgSync.token).to.equal(2);
+      expect(thrpgSync.todoist).to.equal(3);
+      expect(thrpgSync.historyPath).to.match(/\.todoist-habitrpg\.json/);
+      expect(thrpgSync.habiticaClient).to.exist;
+    });
+  });
+  context('run', () => {
+    let fileExistsStub,
       readFileStub,
       writeFileStub,
       syncTodoistStub,
@@ -187,12 +203,15 @@ describe('todoist-habitrpg', () => {
     };
 
     before(() => {
-      sync = new thrpg(fakeOptions);
       fileExistsStub = sinon.stub(fs, 'existsSync');
       readFileStub = sinon.stub(fs, 'readFileSync');
       writeFileStub = sinon.stub(fs, 'writeFile');
       syncTodoistStub = sinon.stub(sync, 'syncTodoist');
       habiticaStub = sinon.stub(habitica.prototype);
+    });
+
+    beforeEach(() => {
+      writeFileStub.yields();
     });
 
     afterEach(() => {
@@ -207,23 +226,14 @@ describe('todoist-habitrpg', () => {
     });
 
     after(() => {
+      fileExistsStub.restore();
+      readFileStub.restore();
       writeFileStub.restore();
       syncTodoistStub.restore();
       habiticaStub.del.restore();
       habiticaStub.get.restore();
       habiticaStub.post.restore();
       habiticaStub.put.restore();
-    });
-
-    it('should require certain options for instantiation', () => {
-      expect(() => new thrpg()).to.throw(/No Habitica User Id found/);
-      expect(() => new thrpg({uid: 1})).to.throw(/No Habitica API Token found/);
-      expect(() => new thrpg({uid: 1, token: 2})).to.throw(/No Todoist API Token found/);
-      const thrpgSync = new thrpg({uid: 1, token: 2, todoist: 3});
-      expect(thrpgSync.uid).to.equal(1);
-      expect(thrpgSync.token).to.equal(2);
-      expect(thrpgSync.todoist).to.equal(3);
-      expect(thrpgSync.historyPath).to.match(/\.todoist-habitrpg\.json/);
     });
 
     it('should send Todoist tasks to HabitRPG if there was no history file found', () => {
@@ -927,4 +937,76 @@ describe('todoist-habitrpg', () => {
       });
     });
   });
+  context('loadSavedHistorySync', () => {
+    let existsSyncStub, readFileSyncStub;
+    before(() => {
+      existsSyncStub = sinon.stub(fs, 'existsSync');
+      readFileSyncStub = sinon.stub(fs, 'readFileSync');
+    });
+    afterEach(() => {
+      existsSyncStub.reset();
+      readFileSyncStub.reset();
+    });
+    after(() => {
+      existsSyncStub.restore();
+      readFileSyncStub.restore();
+    });
+    it('returns an object if no history is found', () => {
+      existsSyncStub.returns(false);
+      expect(JSON.stringify(sync.loadSavedHistorySync())).to.equal(JSON.stringify({tasks: {}}))
+    });
+    it('parses the history file', () => {
+      existsSyncStub.returns(true);
+      const history = JSON.stringify({
+        seqNo: todoistResponse.seq_no,
+        tasks: {
+          44444444: {
+            habitrpg: {id: "44444444"},
+            todoist: todoistResponse.items[0]
+          }
+        }
+      });
+      readFileSyncStub.returns(history);
+      expect(JSON.stringify(sync.loadSavedHistorySync())).to.equal(history);
+    });
+    it('resets the history if it can\'t read it', () => {
+      existsSyncStub.returns(true);
+      readFileSyncStub.returns('I am a corrupted file');
+      expect(JSON.stringify(sync.loadSavedHistorySync())).to.equal(JSON.stringify({tasks: {}}))
+    });
+  });
+  context('saveHistory', () => {
+    let writeFileStub;
+    before(() => {
+      writeFileStub = sinon.stub(fs, 'writeFile');
+    });
+    beforeEach(() => {
+      writeFileStub.yields();
+    })
+    afterEach(() => {
+      writeFileStub.reset();
+    });
+    after(() => {
+      writeFileStub.restore();
+    });
+
+    it('writes the history', () => {
+      const history = {foo: 'bar'};
+      return sync.saveHistory(history).then(() => {
+        expect(writeFileStub).to.be.calledWith(sync.historyPath, JSON.stringify(history));
+      });
+    });
+    it('handles write errors', () => {
+      const history = {foo: 'bar'};
+      const myErr = new Error('Something bad happened');
+      writeFileStub.yields(myErr);
+
+      return sync.saveHistory(history).then(() => {
+        return Promise.reject();
+      }).catch((err) => {
+        expect(err).to.equal(myErr);
+        return Promise.resolve();
+      });
+    });
+  })
 });

@@ -99,7 +99,11 @@ class HabitSync {
     let history;
     if(fs.existsSync(this.historyPath)) {
       const data = fs.readFileSync(this.historyPath, 'utf8');
-      history = JSON.parse(data);
+      try {
+        history = JSON.parse(data);
+      } catch(e) {
+        console.error(`History file is malformed: ${e}`);
+      }
     }
     if(typeof history !== 'object') history = {};
     if(!history.tasks) history.tasks = {};
@@ -115,7 +119,12 @@ class HabitSync {
      *   },
      *
      */
-    return fs.writeFile(this.historyPath, JSON.stringify(history));
+    return new Promise((resolve, reject) => {
+      fs.writeFile(this.historyPath, JSON.stringify(history), (err) => {
+        if(err) return reject(err);
+        return resolve();
+      });
+    });
   }
 
   syncTodoist() {
