@@ -107,6 +107,14 @@ class HabitSync {
   }
 
   saveHistory(history) {
+    /*
+     * tasks: {
+     *   [todoist.id]: {
+     *     habitrpg: {},
+     *     todoist: {},
+     *   },
+     *
+     */
     return fs.writeFile(this.historyPath, JSON.stringify(history));
   }
 
@@ -250,18 +258,13 @@ class HabitSync {
     })
   }
 
-  writeHistorySync(history) {
-    /*
-     * tasks: {
-     *   [todoist.id]: {
-     *     habitrpg: {},
-     *     todoist: {},
-     *   },
-     *
-     */
-    fs.writeFileSync(this.historyPath, JSON.stringify(history));
+  mapLabels(labels) {
+    return Object.keys(labels).reduce((obj, l) => {
+      const label = labels[l];
+      obj[label.id] = this.parseLabel(label.name);
+      return obj;
+    }, {});
   }
-
 
   parseLabel(label) {
     switch(label.toLowerCase()) {

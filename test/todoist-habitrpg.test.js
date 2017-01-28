@@ -170,7 +170,6 @@ describe('todoist-habitrpg', function (done) {
     readFileStub,
     writeFileStub,
     syncTodoistStub,
-    syncItemsToHabitRpgSpy,
     habiticaStub;
   var taskGenerator = function(todoistItem) {
     return {
@@ -534,26 +533,27 @@ describe('todoist-habitrpg', function (done) {
     });
   });
 
-  xit('should should correctly parse all habit attribute labels from todoist', function() {
-    sync.getHabitAttributeIds(function(error, attributes) {
-      expect(attributes.str).to.contain(todoistLabelResponse.str.id);
-      expect(attributes.str).to.contain(todoistLabelResponse.strength.id);
-      expect(attributes.str).to.contain(todoistLabelResponse.physical.id);
-      expect(attributes.str).to.contain(todoistLabelResponse.phy.id);
-      expect(attributes.int).to.contain(todoistLabelResponse.int.id);
-      expect(attributes.int).to.contain(todoistLabelResponse.intelligence.id);
-      expect(attributes.int).to.contain(todoistLabelResponse.mental.id);
-      expect(attributes.int).to.contain(todoistLabelResponse.men.id);
-      expect(attributes.con).to.contain(todoistLabelResponse.con.id);
-      expect(attributes.con).to.contain(todoistLabelResponse.constitution.id);
-      expect(attributes.con).to.contain(todoistLabelResponse.social.id);
-      expect(attributes.con).to.contain(todoistLabelResponse.soc.id);
-      expect(attributes.per).to.contain(todoistLabelResponse.per.id);
-      expect(attributes.per).to.contain(todoistLabelResponse.perception.id);
-      expect(attributes.per).to.contain(todoistLabelResponse.other.id);
-      expect(attributes.per).to.contain(todoistLabelResponse.oth.id);
-      Promise.resolve();
-    });
+  it('should should correctly parse all habit attribute labels from todoist', function() {
+    const result = sync.mapLabels(todoistLabelResponse);
+    expect(result[todoistLabelResponse.str.id]).to.equal('strength');
+    expect(result[todoistLabelResponse.strength.id]).to.equal('strength');
+    expect(result[todoistLabelResponse.physical.id]).to.equal('strength');
+    expect(result[todoistLabelResponse.phy.id]).to.equal('strength');
+
+    expect(result[todoistLabelResponse.int.id]).to.equal('intelligence');
+    expect(result[todoistLabelResponse.intelligence.id]).to.equal('intelligence');
+    expect(result[todoistLabelResponse.mental.id]).to.equal('intelligence');
+    expect(result[todoistLabelResponse.men.id]).to.equal('intelligence');
+
+    expect(result[todoistLabelResponse.con.id]).to.equal('constitution');
+    expect(result[todoistLabelResponse.constitution.id]).to.equal('constitution');
+    expect(result[todoistLabelResponse.social.id]).to.equal('constitution');
+    expect(result[todoistLabelResponse.soc.id]).to.equal('constitution');
+
+    expect(result[todoistLabelResponse.per.id]).to.equal('perception');
+    expect(result[todoistLabelResponse.perception.id]).to.equal('perception');
+    expect(result[todoistLabelResponse.other.id]).to.equal('perception');
+    expect(result[todoistLabelResponse.oth.id]).to.equal('perception');
   });
 
   it('should not uncheck a daily on habitrpg just because an attribute was changed on todoist', function() {
