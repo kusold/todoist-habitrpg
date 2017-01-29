@@ -604,338 +604,6 @@ describe('todoist-habitrpg', () => {
       });
     });
 
-    describe('Todoist date_string parsing', () => {
-      it('should parse due dates as a todo', () => {
-        var actual = sync.parseTodoistRepeatingDate('Nov 20');
-        expect(actual.type).to.equal('todo');
-        expect(actual.repeat).to.be.undefined;
-      });
-
-      it('should parse todos with no due date as a todo', () => {
-        var actual = sync.parseTodoistRepeatingDate('');
-        expect(actual.type).to.equal('todo');
-        expect(actual.repeat).to.be.undefined;
-      });
-
-      it('should parse todos with "daily" date as a daily', () => {
-        var actual = sync.parseTodoistRepeatingDate('daily');
-        expect(actual.type).to.equal('daily');
-        expect(actual.repeat).to.deep.equal({su: true, m: true, t: true, w: true, th: true, f: true, s: true});
-      });
-
-      it('should parse todos with "every day" date as a daily', () => {
-        var actual = sync.parseTodoistRepeatingDate('every day');
-        expect(actual.type).to.equal('daily');
-        expect(actual.repeat).to.deep.equal({su: true, m: true, t: true, w: true, th: true, f: true, s: true});
-      });
-
-      it('should parse todos with "every night" date as a daily', () => {
-        var actual = sync.parseTodoistRepeatingDate('every night');
-        expect(actual.type).to.equal('daily');
-        expect(actual.repeat).to.deep.equal({su: true, m: true, t: true, w: true, th: true, f: true, s: true});
-      });
-
-      it('should parse tasks that repeat one day a week', () => {
-        var actual = sync.parseTodoistRepeatingDate('every sunday');
-        expect(actual.type, 'Sunday').to.equal('daily');
-        expect(actual.repeat, 'Sunday').to.deep.equal({
-          su: true,
-          m: false,
-          t: false,
-          w: false,
-          th: false,
-          f: false,
-          s: false
-        });
-
-        actual = sync.parseTodoistRepeatingDate('every s');
-        expect(actual.type, 'S').to.equal('daily');
-        expect(actual.repeat, 'S').to.deep.equal({
-          su: true,
-          m: false,
-          t: false,
-          w: false,
-          th: false,
-          f: false,
-          s: false
-        });
-
-        actual = sync.parseTodoistRepeatingDate('every monday');
-        expect(actual.type, 'Monday').to.equal('daily');
-        expect(actual.repeat, 'Monday').to.deep.equal({
-          su: false,
-          m: true,
-          t: false,
-          w: false,
-          th: false,
-          f: false,
-          s: false
-        });
-
-        actual = sync.parseTodoistRepeatingDate('every m');
-        expect(actual.type, 'M').to.equal('daily');
-        expect(actual.repeat, 'M').to.deep.equal({
-          su: false,
-          m: true,
-          t: false,
-          w: false,
-          th: false,
-          f: false,
-          s: false
-        });
-
-        actual = sync.parseTodoistRepeatingDate('every tuesday');
-        expect(actual.type, 'Tuesday').to.equal('daily');
-        expect(actual.repeat, 'Tuesday').to.deep.equal({
-          su: false,
-          m: false,
-          t: true,
-          w: false,
-          th: false,
-          f: false,
-          s: false
-        });
-
-        actual = sync.parseTodoistRepeatingDate('every t');
-        expect(actual.type, 'T').to.equal('daily');
-        expect(actual.repeat, 'T').to.deep.equal({
-          su: false,
-          m: false,
-          t: true,
-          w: false,
-          th: false,
-          f: false,
-          s: false
-        });
-
-        actual = sync.parseTodoistRepeatingDate('every wednesday');
-        expect(actual.type, 'Wednesday').to.equal('daily');
-        expect(actual.repeat, 'Wednesday').to.deep.equal({
-          su: false,
-          m: false,
-          t: false,
-          w: true,
-          th: false,
-          f: false,
-          s: false
-        });
-
-        actual = sync.parseTodoistRepeatingDate('every w');
-        expect(actual.type, 'W').to.equal('daily');
-        expect(actual.repeat, 'W').to.deep.equal({
-          su: false,
-          m: false,
-          t: false,
-          w: true,
-          th: false,
-          f: false,
-          s: false
-        });
-
-        actual = sync.parseTodoistRepeatingDate('every thursday');
-        expect(actual.type, 'Thursday').to.equal('daily');
-        expect(actual.repeat, 'Thursday').to.deep.equal({
-          su: false,
-          m: false,
-          t: false,
-          w: false,
-          th: true,
-          f: false,
-          s: false
-        });
-
-        actual = sync.parseTodoistRepeatingDate('every th');
-        expect(actual.type, 'Th').to.equal('daily');
-        expect(actual.repeat, 'Th').to.deep.equal({
-          su: false,
-          m: false,
-          t: false,
-          w: false,
-          th: true,
-          f: false,
-          s: false
-        });
-
-        actual = sync.parseTodoistRepeatingDate('every friday');
-        expect(actual.type, 'Friday').to.equal('daily');
-        expect(actual.repeat, 'Friday').to.deep.equal({
-          su: false,
-          m: false,
-          t: false,
-          w: false,
-          th: false,
-          f: true,
-          s: false
-        });
-
-        actual = sync.parseTodoistRepeatingDate('every f');
-        expect(actual.type, 'F').to.equal('daily');
-        expect(actual.repeat, 'F').to.deep.equal({
-          su: false,
-          m: false,
-          t: false,
-          w: false,
-          th: false,
-          f: true,
-          s: false
-        });
-
-        actual = sync.parseTodoistRepeatingDate('every saturday');
-        expect(actual.type, 'Saturday').to.equal('daily');
-        expect(actual.repeat, 'Saturday').to.deep.equal({
-          su: false,
-          m: false,
-          t: false,
-          w: false,
-          th: false,
-          f: false,
-          s: true
-        });
-
-        actual = sync.parseTodoistRepeatingDate('every sa');
-        expect(actual.type, 'Sa').to.equal('daily');
-        expect(actual.repeat, 'Sa').to.deep.equal({
-          su: false,
-          m: false,
-          t: false,
-          w: false,
-          th: false,
-          f: false,
-          s: true
-        });
-      });
-
-      it('should parse weekday tasks as a daily that repeats M-F', () => {
-        var actual = sync.parseTodoistRepeatingDate('every weekday');
-        expect(actual.type, 'Weekday').to.equal('daily');
-        expect(actual.repeat, 'Weekday').to.deep.equal({
-          su: false,
-          m: true,
-          t: true,
-          w: true,
-          th: true,
-          f: true,
-          s: false
-        });
-      });
-
-      it('should parse weekened tasks as a daily that repeats Sat and Sun', () => {
-        var actual = sync.parseTodoistRepeatingDate('every weekend');
-        expect(actual.type, 'Weekend').to.equal('daily');
-        expect(actual.repeat, 'Weekend').to.deep.equal({
-          su: true,
-          m: false,
-          t: false,
-          w: false,
-          th: false,
-          f: false,
-          s: true
-        });
-      });
-
-      it('should parse tasks that repeat multiple days a week', () => {
-        var actual = sync.parseTodoistRepeatingDate('every mon,weds,fri');
-        expect(actual.type, 'Mon,Weds,Fri').to.equal('daily');
-        expect(actual.repeat, 'Mon,Weds,Fri').to.deep.equal({
-          su: false,
-          m: true,
-          t: false,
-          w: true,
-          th: false,
-          f: true,
-          s: false
-        });
-      });
-
-      it('should correctly parse the examples Todoist gives', () => {
-        var actual = sync.parseTodoistRepeatingDate('today');
-        expect(actual.type, 'Today').to.equal('todo');
-        expect(actual.repeat, 'Today').to.be.undefined;
-
-        actual = sync.parseTodoistRepeatingDate('tomorrow');
-        expect(actual.type, 'Tomorrow').to.equal('todo');
-        expect(actual.repeat, 'Tomorrow').to.be.undefined;
-
-        actual = sync.parseTodoistRepeatingDate('friday');
-        expect(actual.type, 'Friday').to.equal('todo');
-        expect(actual.repeat, 'Friday').to.be.undefined;
-
-        actual = sync.parseTodoistRepeatingDate('next friday');
-        expect(actual.type, 'Next Friday').to.equal('todo');
-        expect(actual.repeat, 'Next Friday').to.be.undefined;
-
-        actual = sync.parseTodoistRepeatingDate('tom at 16:30');
-        expect(actual.type, 'Tom at 16:30').to.equal('todo');
-        expect(actual.repeat, 'Tom at 16:30').to.be.undefined;
-
-        actual = sync.parseTodoistRepeatingDate('fri at 2pm');
-        expect(actual.type, 'Fri at 2pm').to.equal('todo');
-        expect(actual.repeat, 'Fri at 2pm').to.be.undefined;
-
-        actual = sync.parseTodoistRepeatingDate('every mon, fri at 20:00');
-        expect(actual.type, 'every mon, fri at 20:00').to.equal('daily');
-        expect(actual.repeat, 'every mon, fri at 20:00').to.deep.equal({
-          su: false,
-          m: true,
-          t: false,
-          w: false,
-          th: false,
-          f: true,
-          s: false
-        });
-
-        actual = sync.parseTodoistRepeatingDate('ev day at 1pm');
-        expect(actual.type, 'ev day at 1pm').to.equal('daily');
-        expect(actual.repeat, 'ev day at 1pm').to.deep.equal({
-          su: true,
-          m: true,
-          t: true,
-          w: true,
-          th: true,
-          f: true,
-          s: true
-        });
-
-        // --------------------------------------------------
-        // Date strings that Todoist considers as repeating,
-        // but this sync currently doesn't.
-        // --------------------------------------------------
-
-        // every 7th day in a month
-        actual = sync.parseTodoistRepeatingDate('ev 7');
-        expect(actual.type, 'ev 7').to.equal('todo');
-        expect(actual.repeat, 'ev 7').to.undefined;
-
-        actual = sync.parseTodoistRepeatingDate('every 7th day in a month');
-        expect(actual.type, 'every 7th day in a month').to.equal('todo');
-        expect(actual.repeat, 'every 7th day in a month').to.undefined;
-
-        actual = sync.parseTodoistRepeatingDate('ev 7 may');
-        expect(actual.type, 'ev 7 may').to.equal('todo');
-        expect(actual.repeat, 'ev 7 may').to.undefined;
-
-        actual = sync.parseTodoistRepeatingDate('ev 3 days starting next monday');
-        expect(actual.type, 'ev 3 days starting next monday').to.equal('todo');
-        expect(actual.repeat, 'ev 3 days starting next monday').to.undefined;
-
-        actual = sync.parseTodoistRepeatingDate('every day at 14:30 starting 1 Jan');
-        expect(actual.type, 'every day at 14:30 starting 1 Jan').to.equal('todo');
-        expect(actual.repeat, 'every day at 14:30 starting 1 Jan').to.undefined;
-
-
-        actual = sync.parseTodoistRepeatingDate('every 13 may');
-        expect(actual.type, 'every 13 may').to.equal('todo');
-        expect(actual.repeat, 'every 13 may').to.undefined;
-
-        actual = sync.parseTodoistRepeatingDate('every last day');
-        expect(actual.type, 'every last day').to.equal('todo');
-        expect(actual.repeat, 'every last day').to.undefined;
-
-        actual = sync.parseTodoistRepeatingDate('every 2nd monday');
-        expect(actual.type, 'every 2nd monday').to.equal('todo');
-        expect(actual.repeat, 'every 2nd monday').to.undefined;
-      });
-    });
   });
   context('loadSavedHistorySync', () => {
     let existsSyncStub, readFileSyncStub;
@@ -1027,6 +695,292 @@ describe('todoist-habitrpg', () => {
     tests.map((test) =>
       it(test.name, () =>
         expect(sync.taskNeedsUpdating(test.newTask, test.oldTask)).to.equal(test.expected)
+      )
+    );
+  });
+
+  context('prepareTask', () => {
+
+  });
+  context('parseTodoistRepeatingDate', () => {
+    const tests = [
+      {
+        name: 'parses due dates as a todo',
+        input: 'Nov 20',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        name: 'parses todos with no due date as a todo',
+        input: '',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        input: 'daily',
+        output: {
+          type: 'daily',
+          repeat: {su: true, m: true, t: true, w: true, th: true, f: true, s: true},
+        },
+      },
+      {
+        input: 'every day',
+        output: {
+          type: 'daily',
+          repeat: {su: true, m: true, t: true, w: true, th: true, f: true, s: true},
+        },
+      },
+      {
+        input: 'every night',
+        output: {
+          type: 'daily',
+          repeat: {su: true, m: true, t: true, w: true, th: true, f: true, s: true},
+        },
+      },
+      {
+        input: 'every sunday',
+        output: {
+          type: 'daily',
+          repeat: {su: true, m: false, t: false, w: false, th: false, f: false, s: false},
+        },
+      },
+      {
+        input: 'every s',
+        output: {
+          type: 'daily',
+          repeat: {su: true, m: false, t: false, w: false, th: false, f: false, s: false},
+        },
+      },
+      {
+        input: 'every monday',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: true, t: false, w: false, th: false, f: false, s: false},
+        },
+      },
+      {
+        input: 'every m',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: true, t: false, w: false, th: false, f: false, s: false},
+        },
+      },
+      {
+        input: 'every tuesday',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: false, t: true, w: false, th: false, f: false, s: false},
+        },
+      },
+      {
+        input: 'every t',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: false, t: true, w: false, th: false, f: false, s: false},
+        },
+      },
+      {
+        input: 'every wednesday',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: false, t: false, w: true, th: false, f: false, s: false},
+        },
+      },
+      {
+        input: 'every w',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: false, t: false, w: true, th: false, f: false, s: false},
+        },
+      },
+      {
+        input: 'every thursday',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: false, t: false, w: false, th: true, f: false, s: false},
+        },
+      },
+      {
+        input: 'every th',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: false, t: false, w: false, th: true, f: false, s: false},
+        },
+      },
+      {
+        input: 'every friday',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: false, t: false, w: false, th: false, f: true, s: false},
+        },
+      },
+      {
+        input: 'every f',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: false, t: false, w: false, th: false, f: true, s: false},
+        },
+      },
+      {
+        input: 'every saturday',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: false, t: false, w: false, th: false, f: false, s: true},
+        },
+      },
+      {
+        input: 'every sa',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: false, t: false, w: false, th: false, f: false, s: true},
+        },
+      },
+      {
+        input: 'every weekday',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: true, t: true, w: true, th: true, f: true, s: false},
+        },
+      },
+      {
+        input: 'every weekend',
+        output: {
+          type: 'daily',
+          repeat: {su: true, m: false, t: false, w: false, th: false, f: false, s: true},
+        },
+      },
+      {
+        input: 'every mon,weds,fri',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: true, t: false, w: true, th: false, f: true, s: false},
+        },
+      },
+      {
+        input: 'today',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        input: 'tomorrow',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        input: 'friday',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        input: 'next friday',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        input: 'tom at 16:30',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        input: 'fri at 2pm',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        input: 'every mon, fri at 20:00',
+        output: {
+          type: 'daily',
+          repeat: {su: false, m: true, t: false, w: false, th: false, f: true, s: false},
+        },
+      },
+      {
+        input: 'ev day at 1pm',
+        output: {
+          type: 'daily',
+          repeat: {su: true, m: true, t: true, w: true, th: true, f: true, s: true},
+        },
+      },
+      // --------------------------------------------------
+      // Date strings that Todoist considers as repeating,
+      // but this sync currently doesn't.
+      // --------------------------------------------------
+      {
+        input: 'ev 7',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        input: 'ev 7th day in a month',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        input: 'ev 7 may',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        input: 'ev 3 days starting next monday',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        input: 'every day at 14:30 starting 1 Jan',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        input: 'every 13 may',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        input: 'every last day',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+      {
+        input: 'every 2nd monday',
+        output: {
+          type: 'todo',
+          repeat: undefined,
+        },
+      },
+    ];
+
+    tests.map(test =>
+      it(`parses ${test.input} correctly`, () =>
+        expect(sync.parseTodoistRepeatingDate(test.input)).to.deep.equal(test.output)
       )
     );
   });
