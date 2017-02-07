@@ -98,7 +98,7 @@ habitSync.prototype.findTasksThatNeedUpdating = function(newHistory, oldHistory)
 
 habitSync.prototype.updateHistoryForTodoistItems = function(items) {
   var self = this;
-  var habit = new habitapi(self.uid, self.token, null, 'v2');
+  var habit = new habitapi(self.uid, self.token, 'https://habitica.com/api/v3', 'v2');
   _.forEach(items, function(item) {
     if(history.tasks[item.id]) {
       if(item.is_deleted) {
@@ -142,7 +142,7 @@ habitSync.prototype.getTodoistSync = function(cb) {
 
 habitSync.prototype.syncItemsToHabitRpg = function(items, cb) {
   var self = this
-  var habit = new habitapi(self.uid, self.token, null, 'v2');
+  var habit = new habitapi(self.uid, self.token, 'https://habitica.com/api/v3', 'v2');
   // Cannot execute in parallel. See: https://github.com/HabitRPG/habitrpg/issues/2301
   async.eachSeries(items, function(item, next) {
     async.waterfall([
