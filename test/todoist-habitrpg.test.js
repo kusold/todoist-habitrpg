@@ -700,6 +700,44 @@ describe('todoist-habitrpg', () => {
   });
 
   context('prepareTask', () => {
+    const currentTime = new Date();
+    let clock;
+    before(() => {
+      clock = sinon.useFakeTimers(currentTime.getTime())
+    });
+    after(() => {
+      clock.restore();
+    })
+    let tests = [
+      {
+        name: 'creates a typical todo',
+        input:  {id: 1, is_deleted: false, content: 'My Content', date_added: '1/1/1970', date_string: '', checked: false},
+        output: {id: 1, is_deleted: false, text:    'My Content', dateCreated: new Date('1/1/1970'), completed: false, type: 'todo', repeat: undefined},
+      },
+      {
+        name: 'creates a typical daily',
+        input:  {id: 1, is_deleted: false, content: 'My Content', date_added: '1/1/1970', date_string: 'every sunday', checked: false},
+        output: {id: 1, is_deleted: false, text:    'My Content', dateCreated: new Date('1/1/1970'), completed: false, type: 'daily', repeat: {
+          su: true, m: false, t: false, w: false, th: false, f: false, s: false
+        }},
+      },
+      {
+        name: 'creates a checked todo',
+        input:  {id: 1, is_deleted: false, content: 'My Content', date_added: '1/1/1970', date_string: '', checked: true},
+        output: {id: 1, is_deleted: false, text:    'My Content', dateCreated: new Date('1/1/1970'), completed: true, dateCompleted: currentTime, type: 'todo', repeat: undefined},
+      },
+      {
+        name: 'creates a todo with a due date',
+        input:  {id: 1, is_deleted: false, content: 'My Content', date_added: '1/1/1970', date_string: '', checked: false, due_date_utc: new Date('1/1/2017')},
+        output: {id: 1, is_deleted: false, text:    'My Content', dateCreated: new Date('1/1/1970'), completed: false, type: 'todo', repeat: undefined, date: new Date('1/1/2017')},
+      },
+
+    ];
+    return tests.map(test =>
+      it(test.name, () =>
+        expect(sync.prepareTask(test.input)).to.deep.equal(test.output)
+      )
+    )
 
   });
   context('parseTodoistRepeatingDate', () => {
