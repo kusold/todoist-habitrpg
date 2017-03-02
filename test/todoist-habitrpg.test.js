@@ -5,9 +5,11 @@ const path = require('path');
 const _ = require('lodash');
 const chai = require('chai');
 const expect = require('chai').expect;
+const fetch = require('isomorphic-fetch');
+const habitica = require('habitica');
+const nock = require('nock');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
-const habitica = require('habitica');
 
 const thrpg = require('../habitSync_new.js');
 
@@ -678,7 +680,66 @@ describe('todoist-habitrpg', () => {
     });
   });
   context('syncTodoist', () => {
-    it('syncTodoist Placeholder')
+    let scope;
+    const syncPath = '/API/v7/sync';
+    before(() => {
+      scope = nock('https://todoist.com', {
+        reqheaders: {
+          accept: 'application/json',
+        }
+      });
+    });
+
+    it('uses the correct sync token', () => {
+      const tmpSync = new thrpg({uid: 1, token: 2, todoist: 3})
+      tmpSync.previousHistory = {
+        sync_token: "Sync",
+      };
+
+      scope
+        .get(syncPath)
+        .query({token: 3, sync_token: 'Sync', resource_types: '["all"]'})
+        .reply(200, {body: 'hello'});
+
+
+      return tmpSync.syncTodoist().then(res => {
+        expect(res).to.deep.equal({body: 'hello'});
+        expect(scope.isDone()).to.equal(true);
+      });
+    })
+
+    it('uses the default sync token', () => {
+      const tmpSync = new thrpg({uid: 1, token: 2, todoist: 3})
+      tmpSync.previousHistory = {};
+
+      scope
+        .get(syncPath)
+        .query({token: 3, sync_token: '*', resource_types: '["all"]'})
+        .reply(200, {body: 'hello'});
+
+      return tmpSync.syncTodoist().then(res => {
+        expect(res).to.deep.equal({body: 'hello'});
+        expect(scope.isDone()).to.equal(true);
+      });
+    });
+
+    it('throws on a bad response', () => {
+      const tmpSync = new thrpg({uid: 1, token: 2, todoist: 3})
+      tmpSync.previousHistory = {};
+
+      scope
+        .get(syncPath)
+        .query({token: 3, sync_token: '*', resource_types: '["all"]'})
+        .reply(400, {body: 'hello'});
+
+      return tmpSync.syncTodoist().then(() =>
+        expect(true).to.equal(false)
+      ).catch(err => {
+        expect(err instanceof Error).to.equal(true);
+        expect(err.message).to.deep.equal('Problem retrieving Todoist history: Bad Request');
+        expect(scope.isDone()).to.equal(true);
+      });
+    });
   });
 
   context('taskNeedsUpdating', () => {
